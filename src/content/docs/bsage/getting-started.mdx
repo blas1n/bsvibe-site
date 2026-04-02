@@ -1,0 +1,29 @@
+---
+title: 시작하기
+description: BSage를 설치하고 개인 AI 비서를 시작합니다.
+---
+
+BSage는 온톨로지 기반 지식 관리 시스템으로, 정보를 자동으로 분류하고 연결하는 AI 비서입니다.
+
+## BSage가 하는 일
+
+- **자동 지식 정리**: 입력된 정보를 자동 분류 및 태깅
+- **Knowledge Graph**: 지식 간의 관계를 시각적으로 탐색
+- **18개 플러그인**: Telegram, Slack, Discord, Email 등 다양한 연동
+- **자연어 검색**: 의미 기반 검색으로 관련 지식 탐색
+
+## 빠른 시작
+
+```bash
+git clone https://github.com/blas1n/BSage.git
+cd BSage
+uv sync
+uv run bsage setup
+uv run bsage run
+```
+
+브라우저에서 `http://localhost:3400`에 접속하세요.
+
+## 다음 단계
+
+- [핵심 개념](/bsage/concepts) — 플러그인, 스킬, Knowledge Graph 이해하기

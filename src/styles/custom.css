@@ -1,0 +1,100 @@
+/*
+ * BSVibe Starlight Theme Override
+ * Dark theme with Plus Jakarta Sans + product accent colors
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Starlight CSS Custom Properties ─── */
+:root {
+  /* Typography */
+  --sl-font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Dark theme colors (override Starlight defaults) */
+  --sl-color-accent-low: #1e1b4b;
+  --sl-color-accent: #6366f1;
+  --sl-color-accent-high: #c7d2fe;
+
+  --sl-color-white: #f2f3f7;
+  --sl-color-gray-1: #e4e6ee;
+  --sl-color-gray-2: #a8adc6;
+  --sl-color-gray-3: #8187a8;
+  --sl-color-gray-4: #5a5f7d;
+  --sl-color-gray-5: #2a2d42;
+  --sl-color-gray-6: #181926;
+  --sl-color-black: #0a0b0f;
+
+  --sl-color-bg-nav: rgba(10, 11, 15, 0.85);
+  --sl-color-bg-sidebar: #111218;
+
+  /* Text size */
+  --sl-text-sm: 0.875rem;
+  --sl-text-base: 1rem;
+  --sl-text-lg: 1.125rem;
+  --sl-text-xl: 1.25rem;
+  --sl-text-2xl: 1.5rem;
+  --sl-text-3xl: 1.875rem;
+  --sl-text-4xl: 2.25rem;
+}
+
+/* Force dark mode */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #1e1b4b;
+  --sl-color-accent: #6366f1;
+  --sl-color-accent-high: #c7d2fe;
+
+  --sl-color-white: #f2f3f7;
+  --sl-color-gray-1: #e4e6ee;
+  --sl-color-gray-2: #a8adc6;
+  --sl-color-gray-3: #8187a8;
+  --sl-color-gray-4: #5a5f7d;
+  --sl-color-gray-5: #2a2d42;
+  --sl-color-gray-6: #181926;
+  --sl-color-black: #0a0b0f;
+
+  --sl-color-bg-nav: rgba(10, 11, 15, 0.85);
+  --sl-color-bg-sidebar: #111218;
+}
+
+/* ─── Navigation backdrop blur ─── */
+header.header {
+  backdrop-filter: blur(12px);
+}
+
+/* ─── Sidebar active link accent ─── */
+nav.sidebar a[aria-current='page'] {
+  font-weight: 600;
+}
+
+/* ─── Code blocks ─── */
+pre {
+  border: 1px solid #2a2d42 !important;
+  background-color: #111218 !important;
+}
+
+/* ─── Product section accent overrides ─── */
+[data-product='bsgateway'] {
+  --sl-color-accent-low: #451a03;
+  --sl-color-accent: #f59e0b;
+  --sl-color-accent-high: #fde68a;
+}
+
+[data-product='bsnexus'] {
+  --sl-color-accent-low: #172554;
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-high: #bfdbfe;
+}
+
+[data-product='bsupervisor'] {
+  --sl-color-accent-low: #4c0519;
+  --sl-color-accent: #f43f5e;
+  --sl-color-accent-high: #fecdd3;
+}
+
+[data-product='bsage'] {
+  --sl-color-accent-low: #022c22;
+  --sl-color-accent: #10b981;
+  --sl-color-accent-high: #a7f3d0;
+}

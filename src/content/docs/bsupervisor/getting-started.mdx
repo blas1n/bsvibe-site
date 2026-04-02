@@ -1,0 +1,27 @@
+---
+title: 시작하기
+description: BSupervisor를 설치하고 AI 에이전트 감사를 시작합니다.
+---
+
+BSupervisor는 AI 에이전트의 행동을 실시간으로 감시하고 감사하는 안전 레이어입니다.
+
+## BSupervisor가 하는 일
+
+- **실시간 규칙 평가**: 8개 기본 안전 규칙 (SQL injection, PII leak 등)
+- **커스텀 규칙**: 조직에 맞는 감사 규칙 생성
+- **비용 추적**: 에이전트별/모델별 LLM 비용 모니터링
+- **일일 보고서**: 자동 생성되는 감사 리포트
+
+## 빠른 시작
+
+```bash
+git clone https://github.com/blas1n/BSupervisor.git
+cd BSupervisor
+docker compose up -d
+```
+
+브라우저에서 `http://localhost:3500`에 접속하세요.
+
+## 다음 단계
+
+- [핵심 개념](/bsupervisor/concepts) — 규칙 엔진, 이벤트 수집 이해하기

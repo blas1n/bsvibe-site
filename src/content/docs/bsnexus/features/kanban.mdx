@@ -1,0 +1,25 @@
+---
+title: Kanban 보드
+description: 실시간 Kanban 보드로 프로젝트 진행 상황을 관리합니다.
+---
+
+## 개요
+
+BSNexus의 Kanban 보드는 WebSocket을 통해 실시간으로 업데이트됩니다.
+
+### 칼럼 구성
+
+| 칼럼 | 상태 | 설명 |
+|------|------|------|
+| Backlog | PENDING | 대기 중인 태스크 |
+| In Progress | IN_PROGRESS | 실행 중인 태스크 |
+| Review | IN_REVIEW | 검토 대기 |
+| Done | COMPLETED | 완료된 태스크 |
+
+### 태스크 카드 정보
+
+각 카드에는 다음 정보가 표시됩니다:
+- 태스크 제목과 설명
+- 배정된 Executor
+- 의존성 관계
+- 진행률

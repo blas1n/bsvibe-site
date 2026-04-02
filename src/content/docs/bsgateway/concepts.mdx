@@ -1,0 +1,73 @@
+---
+title: 핵심 개념
+description: BSGateway의 라우팅 계층, 분류기, API 키 관리를 이해합니다.
+---
+
+## 라우팅 계층
+
+BSGateway는 4단계 라우팅 계층을 통해 요청을 처리합니다:
+
+```
+요청 → Passthrough → Alias → Pattern → Auto → 모델 호출
+```
+
+### 1. Passthrough
+
+등록된 모델 ID와 정확히 일치하면 해당 모델로 직접 전달합니다.
+
+```
+요청: model="claude-sonnet" → claude-sonnet으로 직접 전달
+```
+
+### 2. Alias
+
+별칭을 통해 모델을 참조할 수 있습니다.
+
+```yaml
+aliases:
+  fast: gpt-4o-mini
+  smart: claude-sonnet
+```
+
+### 3. Pattern
+
+glob 패턴으로 요청 내용에 따라 라우팅합니다.
+
+```yaml
+rules:
+  - pattern: "code/*"
+    model: claude-sonnet
+  - pattern: "translate/*"
+    model: gpt-4o-mini
+```
+
+### 4. Auto
+
+분류기가 요청의 복잡도를 분석해 최적 모델을 자동 선택합니다.
+
+## 분류기 (Classifier)
+
+분류기는 요청의 복잡도를 `simple`, `moderate`, `complex` 중 하나로 판단합니다:
+
+| 전략 | 설명 | 속도 | 정확도 |
+|------|------|------|--------|
+| `static` | 키워드/패턴 기반 휴리스틱 | 빠름 | 보통 |
+| `llm` | 로컬 LLM(Ollama) 기반 | 보통 | 높음 |
+| `ml` | 학습된 sklearn 모델 | 빠름 | 높음 |
+
+## API 키 관리
+
+BSGateway는 멀티테넌트 API 키를 지원합니다:
+
+- **API 키 생성**: 대시보드에서 프로젝트별 API 키 발급
+- **사용량 추적**: 키별 요청 수, 토큰 수, 비용 추적
+- **Rate Limiting**: Redis 기반 요청 제한
+- **AES-256-GCM 암호화**: API 키는 암호화되어 저장
+
+## 비용 추적
+
+모든 요청의 토큰 사용량과 비용이 PostgreSQL에 기록됩니다:
+
+- 모델별 비용 집계
+- 일/주/월 단위 사용량 리포트
+- 대시보드에서 시각화

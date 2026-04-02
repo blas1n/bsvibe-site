@@ -1,0 +1,71 @@
+---
+title: 시작하기
+description: BSGateway를 설치하고 첫 번째 라우팅 규칙을 설정합니다.
+---
+
+BSGateway는 LLM API 요청의 복잡도를 분석해 가장 비용 효율적인 모델로 자동 라우팅하는 프록시입니다.
+
+## BSGateway가 하는 일
+
+- **요청 복잡도 분석**: 간단한 질문은 저렴한 모델로, 복잡한 작업은 고성능 모델로
+- **비용 최적화**: 동일한 품질을 유지하면서 LLM 비용을 절감
+- **OpenAI 호환 API**: 기존 코드 변경 없이 엔드포인트만 교체
+
+## 빠른 시작
+
+### 1. 환경 설정
+
+```bash
+git clone https://github.com/blas1n/BSGateway.git
+cd BSGateway
+```
+
+### 2. 설정 파일 작성
+
+`gateway.yaml`에 사용할 모델과 라우팅 규칙을 정의합니다:
+
+```yaml
+models:
+  - id: claude-sonnet
+    provider: anthropic
+    api_key: ${ANTHROPIC_API_KEY}
+  - id: gpt-4o-mini
+    provider: openai
+    api_key: ${OPENAI_API_KEY}
+
+routing:
+  default_model: gpt-4o-mini
+  rules:
+    - pattern: "*/complex/*"
+      model: claude-sonnet
+```
+
+### 3. 실행
+
+```bash
+docker compose up -d
+```
+
+### 4. API 호출
+
+기존 OpenAI SDK 코드에서 base URL만 변경하면 됩니다:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:4000/v1",
+    api_key="your-bsgateway-api-key",
+)
+
+response = client.chat.completions.create(
+    model="auto",  # BSGateway가 최적 모델 자동 선택
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+```
+
+## 다음 단계
+
+- [핵심 개념](/bsgateway/concepts) — 라우팅 계층과 분류기 이해하기
+- [라우팅 규칙](/bsgateway/features/routing) — 세부 라우팅 규칙 설정
+- [설정](/bsgateway/configuration) — 전체 설정 옵션 레퍼런스

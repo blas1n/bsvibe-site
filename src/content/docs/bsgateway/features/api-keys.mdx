@@ -1,0 +1,44 @@
+---
+title: API 키 관리
+description: BSGateway API 키를 생성하고 관리합니다.
+---
+
+## API 키 생성
+
+대시보드의 **API Keys** 페이지에서 새 API 키를 발급합니다.
+
+### 키 속성
+
+| 속성 | 설명 |
+|------|------|
+| 이름 | 키를 식별하는 라벨 (예: "프로덕션", "개발용") |
+| 프로젝트 | 키가 속한 프로젝트/테넌트 |
+| Rate Limit | 분당 최대 요청 수 |
+| 만료일 | 키 자동 만료 날짜 (선택) |
+
+### 보안
+
+- API 키는 **AES-256-GCM**으로 암호화되어 저장됩니다
+- 키는 생성 시 한 번만 표시됩니다 — 안전한 곳에 보관하세요
+- 유출 의심 시 즉시 **Revoke**하고 새 키를 발급하세요
+
+## 사용량 모니터링
+
+**Usage Analytics** 페이지에서 API 키별 사용량을 확인합니다:
+
+- 요청 수 (일/주/월)
+- 토큰 사용량 (입력/출력)
+- 비용 추정
+- 모델별 분포
+
+## Rate Limiting
+
+Redis 기반의 sliding window rate limiting이 적용됩니다:
+
+```yaml
+rate_limit:
+  requests_per_minute: 60
+  tokens_per_minute: 100000
+```
+
+제한 초과 시 `429 Too Many Requests` 응답을 반환합니다.

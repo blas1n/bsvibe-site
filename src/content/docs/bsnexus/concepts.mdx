@@ -1,0 +1,34 @@
+---
+title: 핵심 개념
+description: BSNexus의 아키텍처와 핵심 구성 요소를 이해합니다.
+---
+
+## Architect
+
+Architect는 사용자의 아이디어를 구조화된 프로젝트로 변환하는 AI 대화 인터페이스입니다.
+
+자연어로 만들고 싶은 것을 설명하면, Architect가:
+1. 요구사항을 분석하고 명확화 질문을 합니다
+2. 프로젝트 구조와 태스크 목록을 생성합니다
+3. 각 태스크에 적절한 Executor를 배정합니다
+
+## Task State Machine
+
+모든 태스크는 다음 상태를 거칩니다:
+
+```
+PENDING → ASSIGNED → IN_PROGRESS → IN_REVIEW → COMPLETED
+                                       ↓
+                                    FAILED → PENDING (재시도)
+```
+
+## Executor
+
+Executor는 실제 작업을 수행하는 에이전트입니다. ExecutorProtocol을 구현하면 어떤 실행 환경이든 연결할 수 있습니다.
+
+기본 제공 Executor:
+- **Claude Code Executor**: Claude Code CLI를 활용한 코드 생성/수정
+
+## Kanban Board
+
+실시간 WebSocket 기반 Kanban 보드에서 모든 태스크의 진행 상황을 시각적으로 확인합니다.

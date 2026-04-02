@@ -1,0 +1,40 @@
+---
+title: BSVibe 문서
+description: BSVibe 제품 문서 허브
+template: splash
+hero:
+  title: BSVibe 문서
+  tagline: AI 소프트웨어 생태계의 제품 가이드
+  actions:
+    - text: BSGateway 시작하기
+      link: /bsgateway/getting-started
+      icon: right-arrow
+    - text: BSNexus 시작하기
+      link: /bsnexus/getting-started
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="BSGateway" icon="rocket">
+    LLM 비용 최적화 라우팅 프록시.
+    요청 복잡도를 분석해 최적의 모델을 자동 선택합니다.
+    [시작하기 →](/bsgateway/getting-started)
+  </Card>
+  <Card title="BSNexus" icon="puzzle">
+    AI 에이전트 오케스트레이션 플랫폼.
+    아이디어를 말하면 AI가 동시에 만듭니다.
+    [시작하기 →](/bsnexus/getting-started)
+  </Card>
+  <Card title="BSupervisor" icon="approve-check-circle">
+    AI 행동 감사 시스템.
+    AI가 안전하게 행동하는지 실시간으로 감시합니다.
+    [시작하기 →](/bsupervisor/getting-started)
+  </Card>
+  <Card title="BSage" icon="open-book">
+    온톨로지 기반 지식 관리.
+    정리하지 않아도 알아서 기억하고 연결합니다.
+    [시작하기 →](/bsage/getting-started)
+  </Card>
+</CardGrid>

@@ -1,0 +1,123 @@
+---
+title: 설정
+description: BSGateway의 전체 설정 옵션 레퍼런스입니다.
+---
+
+## gateway.yaml
+
+BSGateway의 모든 설정은 `gateway.yaml` 단일 파일에서 관리됩니다.
+
+### 모델 설정
+
+```yaml
+models:
+  - id: claude-sonnet           # 고유 모델 ID
+    provider: anthropic          # 제공자 (anthropic, openai, ollama)
+    api_key: ${ANTHROPIC_API_KEY} # 환경변수 참조
+    max_tokens: 4096             # 최대 출력 토큰 (선택)
+
+  - id: gpt-4o-mini
+    provider: openai
+    api_key: ${OPENAI_API_KEY}
+
+  - id: local-llama
+    provider: ollama
+    api_base: http://localhost:11434
+```
+
+### 라우팅 설정
+
+```yaml
+routing:
+  default_model: gpt-4o-mini    # 기본 모델
+
+  aliases:
+    fast: gpt-4o-mini
+    smart: claude-sonnet
+
+  rules:
+    - pattern: "code/*"
+      model: claude-sonnet
+      priority: 10
+
+  auto:
+    classifier: static          # static | llm | ml
+    complexity_map:
+      simple: gpt-4o-mini
+      moderate: claude-sonnet
+      complex: claude-sonnet
+```
+
+### 데이터베이스
+
+```yaml
+database:
+  url: ${DATABASE_URL}          # PostgreSQL 연결 문자열
+```
+
+### Redis
+
+```yaml
+redis:
+  url: ${REDIS_URL}             # Redis 연결 문자열
+```
+
+### 보안
+
+```yaml
+security:
+  encryption_key: ${ENCRYPTION_KEY}  # AES-256-GCM 키 (32바이트 base64)
+  cors_allowed_origins:
+    - https://gateway.bsvibe.dev
+    - http://localhost:3300
+```
+
+## 환경변수
+
+| 변수 | 필수 | 설명 |
+|------|------|------|
+| `DATABASE_URL` | O | PostgreSQL 연결 문자열 |
+| `REDIS_URL` | O | Redis 연결 문자열 |
+| `ENCRYPTION_KEY` | O | API 키 암호화 키 |
+| `ANTHROPIC_API_KEY` | - | Anthropic API 키 |
+| `OPENAI_API_KEY` | - | OpenAI API 키 |
+| `BSVIBE_AUTH_URL` | - | 인증 서버 URL (기본: https://auth.bsvibe.dev) |
+
+## Docker 배포
+
+```yaml
+# deploy/docker-compose.yml
+services:
+  gateway:
+    build: .
+    ports:
+      - "4000:4000"
+    env_file: .env
+    volumes:
+      - ./gateway.yaml:/app/gateway.yaml:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: bsgateway
+      POSTGRES_USER: bsgateway
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bsgateway"]
+      interval: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+
+volumes:
+  pgdata:
+```

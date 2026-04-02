@@ -1,0 +1,69 @@
+---
+title: 라우팅 규칙
+description: BSGateway의 라우팅 규칙을 설정하고 관리합니다.
+---
+
+## 라우팅 규칙 설정
+
+`gateway.yaml`에서 라우팅 규칙을 정의합니다.
+
+### Passthrough 모델
+
+설정 파일에 등록된 모든 모델은 자동으로 passthrough 대상이 됩니다:
+
+```yaml
+models:
+  - id: claude-sonnet
+    provider: anthropic
+  - id: gpt-4o-mini
+    provider: openai
+```
+
+### Alias 규칙
+
+자주 쓰는 모델에 짧은 별명을 부여합니다:
+
+```yaml
+aliases:
+  fast: gpt-4o-mini
+  smart: claude-sonnet
+  code: claude-sonnet
+```
+
+### Pattern 규칙
+
+요청 메타데이터나 내용에 따라 모델을 선택합니다:
+
+```yaml
+rules:
+  - pattern: "code/*"
+    model: claude-sonnet
+    priority: 10
+  - pattern: "translate/*"
+    model: gpt-4o-mini
+    priority: 5
+```
+
+- `priority`가 높은 규칙이 먼저 평가됩니다
+- glob 패턴 문법을 지원합니다
+
+### Auto 라우팅
+
+`model: "auto"`로 요청하면 분류기가 복잡도를 판단합니다:
+
+```yaml
+auto:
+  classifier: static  # static | llm | ml
+  complexity_map:
+    simple: gpt-4o-mini
+    moderate: claude-sonnet
+    complex: claude-opus
+```
+
+## 대시보드에서 관리
+
+웹 대시보드의 **Rules** 페이지에서 라우팅 규칙을 시각적으로 관리할 수 있습니다:
+
+1. 규칙 추가/수정/삭제
+2. 우선순위 드래그 앤 드롭
+3. **Routing Simulator**에서 테스트 요청으로 어떤 모델이 선택되는지 확인
