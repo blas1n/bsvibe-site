@@ -1,69 +1,115 @@
 ---
 title: Routing Rules
-description: Configure and manage BSGateway routing rules.
+description: Configure and test routing rules in the BSGateway dashboard.
 ---
 
-## Configuring Routing Rules
+## Overview
 
-Define routing rules in the dashboard.
+BSGateway routing rules are managed on the **Rules** page in the dashboard. Rules are evaluated through a 4-stage pipeline.
 
-### Passthrough Models
+![Rules Page](/images/screenshots/bsgateway-rules.png)
 
-All models registered in the dashboard are automatically eligible for passthrough:
+## Passthrough Models
 
-```yaml
-models:
-  - id: claude-sonnet
-    provider: anthropic
-  - id: gpt-4o-mini
-    provider: openai
+All models registered on the **Models** page are automatically eligible for passthrough. If you specify a registered model ID directly in the `model` parameter, the request is forwarded to that model without any rule evaluation.
+
+![Models Page](/images/screenshots/bsgateway-models.png)
+
+### How to Add a Model
+
+1. Click **Models** in the sidebar
+2. Click the **Add Model** button
+3. Enter the Provider, Model ID, and API Key
+4. Click **Save**
+
+## Alias Rules
+
+Assign short aliases to frequently used models. Configure these in the **Aliases** section on the **Rules** page.
+
+### How to Add an Alias
+
+1. Select the **Aliases** tab on the **Rules** page
+2. Click **Add Alias**
+3. Choose an alias name and the target model
+
+| Alias | Target | Use Case |
+|-------|--------|----------|
+| `fast` | gpt-4o-mini | When fast responses are needed |
+| `smart` | claude-sonnet | When accurate reasoning is needed |
+| `code` | claude-sonnet | Dedicated to code generation |
+
+Usage example:
+```json
+{ "model": "fast", "messages": [...] }
 ```
 
-### Alias Rules
+## Pattern Rules
 
-Assign short aliases to frequently used models:
+Select a model based on request content using glob patterns. Configure these in the **Pattern Rules** tab on the **Rules** page.
 
-```yaml
-aliases:
-  fast: gpt-4o-mini
-  smart: claude-sonnet
-  code: claude-sonnet
-```
+### How to Add a Pattern
 
-### Pattern Rules
+1. Select the **Pattern Rules** tab on the **Rules** page
+2. Click **Add Rule**
+3. Fill in the following:
 
-Select a model based on request metadata or content:
+| Field | Description | Example |
+|-------|-------------|---------|
+| Pattern | Glob pattern | `code/*` |
+| Model | Target model | claude-sonnet |
+| Priority | Priority (higher values are evaluated first) | 10 |
 
-```yaml
-rules:
-  - pattern: "code/*"
-    model: claude-sonnet
-    priority: 10
-  - pattern: "translate/*"
-    model: gpt-4o-mini
-    priority: 5
-```
+### Pattern Matching Examples
 
-- Rules with a higher `priority` are evaluated first
-- Glob pattern syntax is supported
+| Pattern | Matching Requests | Routing |
+|---------|-------------------|---------|
+| `code/*` | Code-related requests | claude-sonnet |
+| `translate/*` | Translation requests | gpt-4o-mini |
+| `*simple*` | Contains the keyword "simple" | gpt-4o-mini |
 
-### Auto Routing
+### Priority
 
-When you send a request with `model: "auto"`, the classifier determines the complexity:
+Rules with higher Priority values are evaluated first. The first matching rule is applied.
 
-```yaml
-auto:
-  classifier: static  # static | llm | ml
-  complexity_map:
-    simple: gpt-4o-mini
-    moderate: claude-sonnet
-    complex: claude-opus
-```
+Example:
+- Priority 10: `code/*` → claude-sonnet
+- Priority 5: `*` → gpt-4o-mini (default fallback)
 
-## Managing Rules in the Dashboard
+A `code/review` request → matches Priority 10 → routed to claude-sonnet
 
-You can visually manage routing rules on the **Rules** page in the web dashboard:
+## Auto Routing
 
-1. Add, edit, or delete rules
-2. Drag and drop to reorder priorities
-3. Use the **Routing Simulator** to test which model would be selected for a given request
+When you send a request with `model="auto"`, the classifier automatically determines complexity. Configure this in the **Auto Routing** tab on the **Rules** page.
+
+### How to Configure Auto Routing
+
+1. Select a **classification strategy**:
+
+| Strategy | Behavior | Additional Latency |
+|----------|----------|--------------------|
+| Static | Keyword/pattern-based heuristics | None |
+| LLM | An LLM evaluates complexity | ~200ms |
+| ML | A trained classification model | ~10ms |
+
+2. Configure **complexity-to-model mapping**:
+
+| Complexity | Default Mapping |
+|------------|-----------------|
+| Simple | gpt-4o-mini |
+| Moderate | claude-sonnet |
+| Complex | claude-opus |
+
+## Routing Test (Simulator)
+
+Test routing results without making an actual API call.
+
+![Routing Test Page](/images/screenshots/bsgateway-routing-test.png)
+
+### How to Use
+
+1. Click **Routing Test** in the sidebar
+2. Enter a test request (model, messages)
+3. Click **Test**
+4. Review the result: which stage matched and which model was ultimately selected
+
+> After adding new rules, always use Routing Test to verify they work as intended.

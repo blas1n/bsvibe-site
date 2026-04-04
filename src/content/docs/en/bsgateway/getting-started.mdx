@@ -1,60 +1,133 @@
 ---
 title: Getting Started
-description: Sign up for BSGateway and make your first API call.
+description: Sign up for BSGateway and make your first API call in 5 minutes.
 ---
 
-BSGateway is a proxy that analyzes the complexity of LLM API requests and automatically routes them to the most cost-effective model.
+BSGateway is a proxy that analyzes LLM API requests and automatically routes them to the most cost-effective model. It provides an OpenAI-compatible API, so you can start using it with almost no changes to your existing code.
 
 ## What BSGateway Does
 
-- **Request complexity analysis**: Simple questions go to cheaper models, complex tasks go to high-performance models
-- **Cost optimization**: Reduce LLM costs while maintaining the same quality
-- **OpenAI-compatible API**: Just swap the endpoint — no code changes needed
+- **Request complexity analysis**: Simple questions are routed to cheaper models, while complex reasoning goes to high-performance models
+- **Cost optimization**: Reduce LLM costs by up to 60% while maintaining the same response quality
+- **OpenAI-compatible API**: Just change the `base_url` and keep using your existing OpenAI/Anthropic SDK code
+- **Real-time monitoring**: View per-model usage, costs, and response times on the dashboard
 
-## Quick Start
+## Quick Start (5 minutes)
 
-### 1. Create an Account
+### Step 1. Sign In
 
-Sign in with your BSVibe account at [gateway.bsvibe.dev](https://gateway.bsvibe.dev).
+Go to [gateway.bsvibe.dev](https://gateway.bsvibe.dev) and click the **Sign in with BSVibe** button. If you don't have a BSVibe account, one will be created automatically.
 
-### 2. Register Models
+![BSGateway Dashboard](/images/screenshots/bsgateway-dashboard.png)
 
-Add the LLM models you want to use on the **Models** page in the dashboard:
+After signing in, you'll see the **System Overview** dashboard. Use the left sidebar to access each feature:
 
-1. Click **Add Model**
-2. Select a provider (Anthropic, OpenAI, Ollama, etc.)
-3. Enter your API key — it is stored encrypted with AES-256-GCM
-4. Set a model ID (e.g., `claude-sonnet`, `gpt-4o-mini`)
+| Menu | Description |
+|------|-------------|
+| **Dashboard** | Overview — request count, token usage, active rules, average response time |
+| **Rules** | Create and manage routing rules |
+| **Models** | Register LLM models and configure API keys |
+| **Routing Test** | Simulate routing results with test requests |
+| **Analytics** | Analyze usage, costs, and per-model distribution |
+| **API Keys** | Issue and manage BSGateway API keys |
+| **Audit Log** | View all API call records |
 
-### 3. Generate an API Key
+### Step 2. Register Models
 
-Create a BSGateway API key on the **API Keys** page in the dashboard.
+Click **Models** in the sidebar.
 
-> The API key is shown only once when created. Store it in a safe place.
+![Models Page](/images/screenshots/bsgateway-models.png)
 
-### 4. Make an API Call
+Click the **Add Model** button and fill in the following:
 
-Just change the base URL and API key in your existing OpenAI SDK code:
+| Field | Example | Description |
+|-------|---------|-------------|
+| Provider | `Anthropic` | Select the model provider |
+| Model ID | `claude-sonnet` | The name used when making requests |
+| API Key | `sk-ant-...` | The key issued by the provider |
+| Max Tokens | `4096` | Maximum output tokens (optional) |
+
+> API keys are encrypted with **AES-256-GCM** before storage. Even the BSGateway server cannot see the original key.
+
+Registering multiple models allows the routing rules to automatically select the best one. We recommend registering at least 2 models (e.g., a low-cost model + a high-performance model).
+
+### Step 3. Issue an API Key
+
+Click **API Keys** in the sidebar.
+
+![API Keys Page](/images/screenshots/bsgateway-api-keys.png)
+
+Click the **Create API Key** button and:
+1. Enter a key name (e.g., `production`, `development`)
+2. Set a Rate Limit (maximum requests per minute)
+3. Click **Create**
+
+> **Important**: The API key is displayed only once when created. Make sure to copy it to a safe place.
+
+### Step 4. Make an API Call
+
+Change only the `base_url` and `api_key` in your existing OpenAI SDK code:
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://gateway.bsvibe.dev/v1",
-    api_key="your-bsgateway-api-key",
+    base_url="https://api-gateway.bsvibe.dev/v1",
+    api_key="bsg_your_api_key_here",
 )
 
+# Auto routing — BSGateway evaluates complexity and selects the optimal model
 response = client.chat.completions.create(
-    model="auto",  # BSGateway automatically selects the best model
-    messages=[{"role": "user", "content": "Hello!"}],
+    model="auto",
+    messages=[{"role": "user", "content": "Implement quicksort in Python"}],
 )
+
+print(response.choices[0].message.content)
 ```
 
-When you send a request with `model="auto"`, the classifier evaluates the complexity and picks the optimal model.
-To target a specific model, use the model ID you registered.
+```javascript
+// Node.js / TypeScript
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: 'https://api-gateway.bsvibe.dev/v1',
+  apiKey: 'bsg_your_api_key_here',
+});
+
+const response = await client.chat.completions.create({
+  model: 'auto',
+  messages: [{ role: 'user', content: 'Hello!' }],
+});
+```
+
+```bash
+# cURL
+curl https://api-gateway.bsvibe.dev/v1/chat/completions \
+  -H "Authorization: Bearer bsg_your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "auto",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### model Parameter Options
+
+| Value | Behavior |
+|-------|----------|
+| `"auto"` | The classifier evaluates complexity and automatically selects the optimal model |
+| `"claude-sonnet"` | Directly specify a registered model ID |
+| `"fast"` | Use a name registered as an alias |
+
+### Step 5. Verify Results
+
+Go back to the **Dashboard** to see statistics for the request you just sent. Visit the **Analytics** page for more detailed usage and cost information.
+
+![Analytics Page](/images/screenshots/bsgateway-usage.png)
 
 ## Next Steps
 
-- [Core Concepts](/bsgateway/concepts) — Understand routing layers and the classifier
-- [Routing Rules](/bsgateway/features/routing) — Configure detailed routing rules
-- [Configuration](/bsgateway/configuration) — Dashboard configuration guide
+- [Core Concepts](/bsgateway/concepts) — The 4-stage routing pipeline and how the classifier works
+- [Routing Rules](/bsgateway/features/routing) — Pattern matching, aliases, and auto routing configuration
+- [API Key Management](/bsgateway/features/api-keys) — Rate limiting, key security, and usage tracking
+- [Configuration Guide](/bsgateway/configuration) — Model management, CORS, and API endpoint reference

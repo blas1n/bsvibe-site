@@ -1,73 +1,114 @@
 ---
-title: 설정
-description: BSGateway 대시보드에서 모델, 라우팅, API 키를 설정합니다.
+title: 설정 가이드
+description: BSGateway 대시보드의 전체 설정과 API 엔드포인트 레퍼런스입니다.
 ---
 
 ## 모델 관리
 
-대시보드 **Models** 페이지에서 LLM 모델을 관리합니다.
+사이드바 **Models** 페이지에서 LLM 모델을 추가하고 관리합니다.
+
+![Models 페이지](/images/screenshots/bsgateway-models.png)
 
 ### 모델 추가
 
-| 필드 | 설명 |
-|------|------|
-| Provider | 모델 제공자 (Anthropic, OpenAI, Ollama 등) |
-| Model ID | 요청 시 사용할 모델 식별자 |
-| API Key | Provider API 키 (AES-256-GCM 암호화 저장) |
-| Max Tokens | 최대 출력 토큰 (선택) |
+**Add Model** 버튼을 클릭하고 다음 필드를 입력합니다:
 
-### Alias 설정
+| 필드 | 필수 | 설명 |
+|------|------|------|
+| Provider | O | 모델 제공자 — Anthropic, OpenAI, Google, Ollama 등 |
+| Model ID | O | API 요청 시 사용할 고유 식별자 (예: `claude-sonnet`) |
+| API Key | O | Provider에서 발급받은 API 키 (AES-256-GCM 암호화 저장) |
+| Max Tokens | - | 최대 출력 토큰 수 (미설정 시 Provider 기본값) |
+| API Base | - | 커스텀 엔드포인트 (Ollama 등 자체 호스팅 모델용) |
 
-자주 쓰는 모델에 짧은 별명을 부여할 수 있습니다:
+### 모델 수정/삭제
 
-| Alias | Target Model |
-|-------|-------------|
-| `fast` | gpt-4o-mini |
-| `smart` | claude-sonnet |
+모델 목록에서 각 모델의 **Edit** 또는 **Delete** 버튼을 사용합니다. API Key는 수정 시 새로 입력해야 합니다 (기존 키는 표시되지 않음).
 
-## 라우팅 규칙
+### 권장 구성
 
-대시보드 **Rules** 페이지에서 라우팅 규칙을 관리합니다.
+최소 2개 이상의 모델을 등록하는 것을 권장합니다:
 
-### 규칙 추가
+| 역할 | 모델 예시 | 용도 |
+|------|----------|------|
+| 저비용 | gpt-4o-mini | 간단한 질문, 번역, 분류 |
+| 고성능 | claude-sonnet | 코드 생성, 분석, 장문 작성 |
+| 프리미엄 | claude-opus | 복잡한 추론, 수학, 아키텍처 설계 |
 
-1. **Add Rule** 클릭
-2. Pattern 입력 (glob 문법 지원)
-3. 대상 모델 선택
-4. 우선순위 설정 (높을수록 먼저 평가)
+## 라우팅 설정
 
-### Auto 라우팅
-
-`model: "auto"`로 요청하면 분류기가 복잡도를 판단합니다:
-
-| 분류 전략 | 설명 |
-|----------|------|
-| Static | 키워드/패턴 기반 휴리스틱 |
-| LLM | 로컬 LLM 기반 분류 |
-| ML | 학습된 모델 기반 분류 |
-
-분류기 전략과 복잡도별 모델 매핑은 **Settings** 페이지에서 설정합니다.
-
-## API 키 관리
-
-대시보드 **API Keys** 페이지에서 키를 생성하고 관리합니다.
-
-### 키 속성
-
-| 속성 | 설명 |
-|------|------|
-| 이름 | 키를 식별하는 라벨 |
-| Rate Limit | 분당 최대 요청 수 |
-| 만료일 | 키 자동 만료 날짜 (선택) |
+사이드바 **Rules** 페이지에서 라우팅 규칙을 관리합니다. 상세 설정은 [라우팅 규칙](/bsgateway/features/routing) 문서를 참고하세요.
 
 ## CORS 설정
 
-**Settings** 페이지에서 허용할 도메인을 설정합니다. 프론트엔드에서 직접 호출하는 경우 도메인을 추가해야 합니다.
+프론트엔드에서 BSGateway API를 직접 호출하는 경우, 허용할 도메인을 설정해야 합니다.
+
+대시보드 우측 상단 ⚙️ → **Settings**에서:
+1. **CORS Origins** 섹션으로 이동
+2. 허용할 도메인 추가 (예: `https://myapp.com`)
+3. **Save** 클릭
 
 ## API 엔드포인트
 
-| 엔드포인트 | 설명 |
-|-----------|------|
-| `https://gateway.bsvibe.dev/v1/chat/completions` | OpenAI 호환 채팅 API |
-| `https://gateway.bsvibe.dev/v1/models` | 등록된 모델 목록 |
-| `https://gateway.bsvibe.dev/health` | 서비스 상태 확인 |
+| 엔드포인트 | 메서드 | 설명 |
+|-----------|--------|------|
+| `/v1/chat/completions` | POST | OpenAI 호환 채팅 API |
+| `/v1/models` | GET | 등록된 모델 목록 |
+| `/health` | GET | 서비스 상태 확인 |
+| `/health/ready` | GET | DB/Redis 연결 상태 확인 |
+
+### 채팅 API 요청 형식
+
+```bash
+POST https://api-gateway.bsvibe.dev/v1/chat/completions
+Authorization: Bearer bsg_your_api_key
+Content-Type: application/json
+
+{
+  "model": "auto",
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Hello!"}
+  ],
+  "temperature": 0.7,
+  "max_tokens": 1024
+}
+```
+
+### 응답 형식
+
+```json
+{
+  "id": "chatcmpl-...",
+  "object": "chat.completion",
+  "model": "claude-sonnet",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Hello! How can I help you today?"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 12,
+    "total_tokens": 37
+  }
+}
+```
+
+> 응답의 `model` 필드에는 실제로 사용된 모델 ID가 표시됩니다. `auto`로 요청했더라도 실제 선택된 모델이 반환됩니다.
+
+## 에러 코드
+
+| 코드 | 설명 |
+|------|------|
+| 400 | 잘못된 요청 형식 |
+| 401 | API 키가 유효하지 않음 |
+| 404 | 지정한 모델이 등록되지 않음 |
+| 429 | Rate Limit 초과 |
+| 500 | 서버 내부 오류 |
+| 502 | Provider API 호출 실패 |

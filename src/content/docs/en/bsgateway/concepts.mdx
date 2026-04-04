@@ -1,73 +1,85 @@
 ---
 title: Core Concepts
-description: Understand BSGateway's routing layers, classifier, and API key management.
+description: Understand BSGateway's 4-stage routing pipeline, classifier, and cost tracking.
 ---
 
-## Routing Layers
+## Routing Pipeline
 
-BSGateway processes requests through a 4-layer routing pipeline:
-
-```
-Request → Passthrough → Alias → Pattern → Auto → Model Call
-```
-
-### 1. Passthrough
-
-If the request matches a registered model ID exactly, it is forwarded directly to that model.
+BSGateway processes every API request through a 4-stage pipeline. If a request matches at any stage, it is routed to that model; otherwise it falls through to the next stage.
 
 ```
-Request: model="claude-sonnet" → Forwarded directly to claude-sonnet
+Request received → ① Passthrough → ② Alias → ③ Pattern → ④ Auto → Model call
 ```
 
-### 2. Alias
+### ① Passthrough
 
-Models can be referenced through aliases.
+If the `model` parameter in the request exactly matches a registered model ID, the request is forwarded directly to that model.
 
-```yaml
-aliases:
-  fast: gpt-4o-mini
-  smart: claude-sonnet
+```json
+{ "model": "claude-sonnet", "messages": [...] }
+// → Forwarded directly to the registered claude-sonnet model
 ```
 
-### 3. Pattern
+### ② Alias
 
-Routes requests based on content using glob patterns.
+Reference models through short aliases. Configure these on the **Rules** page in the dashboard.
 
-```yaml
-rules:
-  - pattern: "code/*"
-    model: claude-sonnet
-  - pattern: "translate/*"
-    model: gpt-4o-mini
-```
+| Alias | Target Model | Use Case |
+|-------|-------------|----------|
+| `fast` | gpt-4o-mini | Simple questions, quick responses |
+| `smart` | claude-sonnet | Complex reasoning, code generation |
+| `cheap` | local-llama | Minimum cost |
 
-### 4. Auto
+### ③ Pattern
 
-The classifier analyzes request complexity and automatically selects the optimal model.
+Select a model based on request metadata or content using glob patterns. Configure patterns and priorities on the **Rules** page.
+
+Examples:
+- `code/*` pattern → claude-sonnet (code generation goes to a high-performance model)
+- `translate/*` pattern → gpt-4o-mini (translation goes to a cheaper model)
+
+Rules with higher priority are evaluated first.
+
+### ④ Auto
+
+Requests that don't match any of the above 3 stages are evaluated by the **Classifier**, which analyzes complexity and automatically selects the optimal model. Sending a request with `model="auto"` triggers this stage.
 
 ## Classifier
 
-The classifier determines request complexity as one of `simple`, `moderate`, or `complex`:
+The classifier determines request complexity as one of `simple`, `moderate`, or `complex`.
 
-| Strategy | Description | Speed | Accuracy |
-|----------|-------------|-------|----------|
-| `static` | Keyword/pattern-based heuristics | Fast | Moderate |
-| `llm` | Local LLM (Ollama) based | Medium | High |
-| `ml` | Trained sklearn model | Fast | High |
+| Complexity | Examples | Recommended Model |
+|------------|----------|-------------------|
+| Simple | "What's the weather?", simple translations | gpt-4o-mini (low cost) |
+| Moderate | Code review, summarization, analysis | claude-sonnet (balanced) |
+| Complex | Architecture design, math proofs, long-form generation | claude-opus (high performance) |
 
-## API Key Management
+### Classification Strategies
 
-BSGateway supports multi-tenant API keys:
+Select a classification strategy in the **Rules** → **Auto Routing** section of the dashboard:
 
-- **API key creation**: Issue project-specific API keys from the dashboard
-- **Usage tracking**: Track request count, token count, and cost per key
-- **Rate Limiting**: Redis-based request throttling
-- **AES-256-GCM encryption**: API keys are stored encrypted
+| Strategy | Behavior | Speed | Accuracy |
+|----------|----------|-------|----------|
+| **Static** | Keyword and pattern-based heuristics | 0ms | Moderate |
+| **LLM** | An LLM evaluates complexity | ~200ms | High |
+| **ML** | A trained classification model | ~10ms | High |
+
+Static is the default. Use LLM or ML strategies when accuracy is critical.
+
+## API Key Security
+
+- **AES-256-GCM encryption**: Registered provider API keys cannot be viewed in plain text, even on the server
+- **Multi-tenant**: Independent usage tracking and rate limiting per API key
+- **Shown once at creation**: Keys cannot be retrieved after creation — issue a new one if lost
 
 ## Cost Tracking
 
-Token usage and cost for every request are recorded:
+Token usage and cost for every API request are automatically recorded:
 
-- Cost aggregation by model
-- Usage reports by day/week/month
-- Visual analytics in the dashboard
+- **Per-model cost aggregation**: See which models are used most and least
+- **Time-based patterns**: Identify peak hours and usage trends
+- **Routing efficiency analysis**: Estimate savings from auto routing
+
+View data with period filters (Today / Last 7 days / Last 30 days) on the **Analytics** page.
+
+![Analytics Dashboard](/images/screenshots/bsgateway-usage.png)

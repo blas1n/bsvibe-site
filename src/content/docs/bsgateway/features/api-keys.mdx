@@ -1,49 +1,83 @@
 ---
 title: API 키 관리
-description: BSGateway API 키를 생성하고 관리합니다.
+description: BSGateway API 키를 생성하고, 사용량을 추적하고, Rate Limiting을 설정합니다.
 ---
 
 ## API 키 생성
 
-대시보드의 **API Keys** 페이지에서 새 API 키를 발급합니다.
+사이드바에서 **API Keys** 페이지로 이동합니다.
 
-![API 키 관리 페이지](/images/screenshots/bsgateway-api-keys.png)
+![API Keys 페이지](/images/screenshots/bsgateway-api-keys.png)
 
-### 키 속성
+### 새 키 발급
 
-| 속성 | 설명 |
-|------|------|
-| 이름 | 키를 식별하는 라벨 (예: "프로덕션", "개발용") |
-| 프로젝트 | 키가 속한 프로젝트/테넌트 |
-| Rate Limit | 분당 최대 요청 수 |
-| 만료일 | 키 자동 만료 날짜 (선택) |
+1. **Create API Key** 클릭
+2. 다음 정보 입력:
 
-### 보안
+| 필드 | 설명 | 예시 |
+|------|------|------|
+| 이름 | 키를 식별하는 라벨 | `production`, `staging` |
+| Rate Limit | 분당 최대 요청 수 | 60 |
+| 만료일 | 자동 만료 날짜 (선택) | 2026-12-31 |
 
-- API 키는 **AES-256-GCM**으로 암호화되어 저장됩니다
-- 키는 생성 시 한 번만 표시됩니다 — 안전한 곳에 보관하세요
-- 유출 의심 시 즉시 **Revoke**하고 새 키를 발급하세요
+3. **Create** 클릭
+
+> **중요**: API 키는 생성 시 **한 번만** 표시됩니다. `bsg_` 접두사로 시작하는 키를 반드시 안전한 곳에 복사하세요. 분실하면 새로 발급해야 합니다.
+
+### 키 보안
+
+- **AES-256-GCM 암호화**: 키는 암호화되어 저장됩니다
+- **키 유출 대응**: 유출 의심 시 즉시 **Revoke** 클릭 → 새 키 발급
+- **환경변수로 관리**: 코드에 키를 하드코딩하지 마세요
+
+```bash
+# 환경변수로 관리 (권장)
+export BSGATEWAY_API_KEY="bsg_your_key_here"
+```
 
 ## 사용량 모니터링
 
-**Usage Analytics** 페이지에서 API 키별 사용량을 확인합니다:
+각 API 키별로 다음 지표가 추적됩니다:
 
-> **[스크린샷]** 대시보드 → Usage Analytics 페이지 화면
+| 지표 | 설명 |
+|------|------|
+| 요청 수 | 일/주/월 단위 API 호출 수 |
+| 입력 토큰 | 요청 메시지의 총 토큰 수 |
+| 출력 토큰 | 응답 메시지의 총 토큰 수 |
+| 추정 비용 | 모델별 단가 기반 비용 계산 |
+| 모델별 분포 | 어떤 모델이 가장 많이 사용되는지 |
 
-- 요청 수 (일/주/월)
-- 토큰 사용량 (입력/출력)
-- 비용 추정
-- 모델별 분포
+**Analytics** 페이지에서 전체 사용량을 확인하고, 개별 키의 사용량은 API Keys 페이지에서 확인합니다.
 
 ## Rate Limiting
 
-Sliding window rate limiting이 적용됩니다. API 키 생성 시 다음 제한을 설정할 수 있습니다:
+Sliding window 기반의 Rate Limiting이 API 키별로 적용됩니다.
 
-| 설정 | 기본값 |
-|------|--------|
+### 기본 설정
+
+| 제한 | 기본값 |
+|------|-------|
 | 분당 요청 수 | 60 |
 | 분당 토큰 수 | 100,000 |
 
-> **[스크린샷]** 대시보드 → API Keys → Rate Limit 설정 화면
+### 제한 초과 시
 
-제한 초과 시 `429 Too Many Requests` 응답을 반환합니다.
+```json
+// HTTP 429 Too Many Requests
+{
+  "error": {
+    "type": "rate_limit_exceeded",
+    "message": "Rate limit exceeded. Please retry after 12 seconds.",
+    "retry_after": 12
+  }
+}
+```
+
+클라이언트에서 `retry_after` 값을 참고해 재시도하세요.
+
+### Rate Limit 변경
+
+API Keys 페이지에서 기존 키의 Rate Limit을 수정할 수 있습니다:
+1. 해당 키의 **Edit** 클릭
+2. Rate Limit 값 수정
+3. **Save** 클릭

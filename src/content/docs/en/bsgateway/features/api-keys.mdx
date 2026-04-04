@@ -1,44 +1,83 @@
 ---
 title: API Key Management
-description: Create and manage BSGateway API keys.
+description: Create BSGateway API keys, track usage, and configure rate limiting.
 ---
 
 ## Creating an API Key
 
-Issue a new API key on the **API Keys** page in the dashboard.
+Navigate to the **API Keys** page in the sidebar.
 
-### Key Properties
+![API Keys Page](/images/screenshots/bsgateway-api-keys.png)
 
-| Property | Description |
-|----------|-------------|
-| Name | A label to identify the key (e.g., "Production", "Development") |
-| Project | The project/tenant the key belongs to |
-| Rate Limit | Maximum requests per minute |
-| Expiration | Auto-expiration date (optional) |
+### Issuing a New Key
 
-### Security
+1. Click **Create API Key**
+2. Fill in the following:
 
-- API keys are stored encrypted with **AES-256-GCM**
-- Keys are shown only once at creation — store them in a safe place
-- If you suspect a key has been compromised, **Revoke** it immediately and issue a new one
+| Field | Description | Example |
+|-------|-------------|---------|
+| Name | A label to identify the key | `production`, `staging` |
+| Rate Limit | Maximum requests per minute | 60 |
+| Expiration | Auto-expiration date (optional) | 2026-12-31 |
+
+3. Click **Create**
+
+> **Important**: The API key is displayed only **once** when created. Make sure to copy the key (which starts with the `bsg_` prefix) to a safe place. If lost, you'll need to issue a new one.
+
+### Key Security
+
+- **AES-256-GCM encryption**: Keys are stored encrypted
+- **Compromised key response**: If you suspect a leak, click **Revoke** immediately and issue a new key
+- **Use environment variables**: Never hard-code keys in your source code
+
+```bash
+# Manage via environment variables (recommended)
+export BSGATEWAY_API_KEY="bsg_your_key_here"
+```
 
 ## Usage Monitoring
 
-Check per-key usage on the **Usage Analytics** page:
+The following metrics are tracked for each API key:
 
-- Request count (daily/weekly/monthly)
-- Token usage (input/output)
-- Cost estimates
-- Model distribution
+| Metric | Description |
+|--------|-------------|
+| Request count | API calls on a daily/weekly/monthly basis |
+| Input tokens | Total tokens in request messages |
+| Output tokens | Total tokens in response messages |
+| Estimated cost | Cost calculation based on per-model pricing |
+| Model distribution | Which models are used most frequently |
+
+View overall usage on the **Analytics** page, and per-key usage on the API Keys page.
 
 ## Rate Limiting
 
-Sliding window rate limiting backed by Redis is applied:
+Sliding window rate limiting is applied per API key.
 
-```yaml
-rate_limit:
-  requests_per_minute: 60
-  tokens_per_minute: 100000
+### Default Settings
+
+| Limit | Default |
+|-------|---------|
+| Requests per minute | 60 |
+| Tokens per minute | 100,000 |
+
+### When Limits Are Exceeded
+
+```json
+// HTTP 429 Too Many Requests
+{
+  "error": {
+    "type": "rate_limit_exceeded",
+    "message": "Rate limit exceeded. Please retry after 12 seconds.",
+    "retry_after": 12
+  }
+}
 ```
 
-When the limit is exceeded, a `429 Too Many Requests` response is returned.
+Use the `retry_after` value in the response to schedule your retry.
+
+### Changing Rate Limits
+
+You can modify the rate limit for an existing key on the API Keys page:
+1. Click **Edit** on the target key
+2. Update the Rate Limit value
+3. Click **Save**

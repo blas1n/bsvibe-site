@@ -1,30 +1,60 @@
 ---
 title: Usage Analytics
-description: Track and analyze LLM usage and costs.
+description: Track LLM usage and costs in real time and gain optimization insights.
 ---
 
-## Dashboard
+## Analytics Dashboard
 
-Monitor real-time usage in the BSGateway dashboard.
+Click **Analytics** in the sidebar to view overall usage and costs at a glance.
 
-### Key Metrics
+![Analytics Dashboard](/images/screenshots/bsgateway-usage.png)
 
-- **Total Requests**: Total API calls within the selected period
-- **Total Tokens**: Sum of input and output tokens
-- **Estimated Cost**: Cost calculated based on per-model pricing
-- **Average Response Time**: Latency per model
+## Key Metrics
 
-### Filters
+| Metric | Description |
+|--------|-------------|
+| **Total Requests** | Total API calls within the selected period |
+| **Total Tokens** | Sum of input and output tokens |
+| **Estimated Cost** | Estimated cost based on per-model pricing (USD) |
+| **Avg Latency** | Average response time per model (ms) |
 
-- Period: Today / 7 days / 30 days / Custom
-- By API key
-- By model
-- By routing type (passthrough / alias / pattern / auto)
+## Period Filters
+
+Select the analysis period in the top right:
+
+| Filter | Range |
+|--------|-------|
+| **Today** | From 00:00 today to now |
+| **Last 7 days** | Past 7 days |
+| **Last 30 days** | Past 30 days |
+
+## Charts
+
+### Request Volume
+
+Displays request count over time as a line chart. Use it to identify peak hours and usage patterns.
+
+### Model Distribution
+
+Visualizes the token usage ratio per model. See which models are used most at a glance.
 
 ## Cost Optimization Insights
 
-The dashboard automatically identifies opportunities to reduce costs:
+Analytics automatically identifies opportunities to reduce costs:
 
-- Cases where simple requests were routed to expensive models
-- Infrequently used models (consider disabling)
-- Peak usage time patterns
+- **Over-routing detection**: Highlights cases where simple requests were routed to expensive models
+- **Inactive models**: Identifies models with low usage (consider disabling)
+- **Peak patterns**: Detects time periods with cost spikes
+
+## Audit Log
+
+Click **Audit Log** in the sidebar to view detailed records of all API calls.
+
+![Audit Log](/images/screenshots/bsgateway-audit.png)
+
+The following information is recorded for each request:
+- Request/response timestamps
+- Model used
+- Routing path (which stage matched)
+- Input/output token counts
+- API key
