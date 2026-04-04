@@ -173,7 +173,7 @@ export default function BSVibeLanding() {
         <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="#products" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>제품</a>
           <a href="/bsgateway/getting-started" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>문서</a>
-          <a href="https://gateway.bsvibe.dev" style={{
+          <a href="https://auth.bsvibe.dev/signup" style={{
             padding: "6px 16px",
             borderRadius: 8,
             backgroundColor: "rgba(99,102,241,0.10)",
@@ -184,6 +184,7 @@ export default function BSVibeLanding() {
           }}>
             시작하기
           </a>
+          <a href="https://auth.bsvibe.dev/login" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>로그인</a>
         </div>
 
         {/* Mobile hamburger */}
@@ -338,7 +339,7 @@ export default function BSVibeLanding() {
             }}>
               둘러보기
             </a>
-            <a href="/bsgateway/getting-started" className="cta-secondary" style={{
+            <a href="https://auth.bsvibe.dev/signup" className="cta-secondary" style={{
               display: "inline-block",
               padding: "13px 28px",
               borderRadius: 10,
@@ -348,7 +349,7 @@ export default function BSVibeLanding() {
               fontWeight: 600,
               letterSpacing: "-0.01em",
             }}>
-              문서
+              계정 만들기
             </a>
           </div>
         </div>
