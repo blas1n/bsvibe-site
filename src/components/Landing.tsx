@@ -133,6 +133,35 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
+
+    // Handle auth callback — parse tokens from hash fragment
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+      if (accessToken && refreshToken) {
+        try {
+          const parts = accessToken.split(".");
+          let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+          const pad = base64.length % 4;
+          if (pad) base64 += "=".repeat(4 - pad);
+          const payload = JSON.parse(atob(base64));
+          const user = {
+            id: payload.sub,
+            email: payload.email,
+            tenantId: payload.app_metadata?.tenant_id ?? "",
+            role: payload.app_metadata?.role ?? "member",
+            accessToken,
+            refreshToken,
+            expiresAt: payload.exp,
+          };
+          localStorage.setItem("bsvibe_user", JSON.stringify(user));
+          history.replaceState(null, "", window.location.pathname + window.location.search);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+
     setUser(getUser());
     return () => clearTimeout(t);
   }, []);
