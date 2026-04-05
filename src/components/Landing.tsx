@@ -128,6 +128,7 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
   const docsBase = locale === "en" ? "/en" : "";
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
@@ -233,18 +234,33 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
         <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="#products" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.products}</a>
           <a href={`${docsBase}/bsgateway/getting-started`} className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.docs}</a>
-          <div style={{ display: "inline-flex", borderRadius: 6, border: "1px solid #2a2d42", overflow: "hidden" }}>
-            {locales.map((loc) => (
-              <a key={loc.code} href={loc.path} style={{
-                padding: "3px 10px",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                color: locale === loc.code ? "#f2f3f7" : "#5a5f7d",
-                backgroundColor: locale === loc.code ? "rgba(99,102,241,0.15)" : "transparent",
-                transition: "all 0.15s",
-              }}>{loc.label}</a>
-            ))}
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setLangOpen(!langOpen)} style={{
+              display: "flex", alignItems: "center", gap: 4,
+              padding: "4px 10px", borderRadius: 6, border: "1px solid #2a2d42",
+              background: "none", color: "#8187a8", fontSize: "0.75rem", fontWeight: 600,
+              cursor: "pointer", transition: "color 0.15s",
+            }}>
+              {locales.find((loc) => loc.code === locale)?.label}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2.5 4L5 6.5L7.5 4"/></svg>
+            </button>
+            {langOpen && (
+              <div style={{
+                position: "absolute", top: "100%", right: 0, marginTop: 4,
+                borderRadius: 8, border: "1px solid #2a2d42", backgroundColor: "#111218",
+                padding: 4, minWidth: 80, zIndex: 100,
+              }}>
+                {locales.filter((loc) => loc.code !== locale).map((loc) => (
+                  <a key={loc.code} href={loc.path} style={{
+                    display: "block", padding: "6px 12px", borderRadius: 4,
+                    fontSize: "0.75rem", fontWeight: 600, color: "#8187a8",
+                    textDecoration: "none", transition: "background 0.15s",
+                  }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(99,102,241,0.1)")}
+                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                  >{loc.label}</a>
+                ))}
+              </div>
+            )}
           </div>
           {user ? (
             <>
@@ -311,16 +327,10 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
         }}>
           <a href="#products" className="nav-link" onClick={() => setMenuOpen(false)} style={{ fontSize: "0.875rem" }}>{l.nav.products}</a>
           <a href={`${docsBase}/bsgateway/getting-started`} className="nav-link" style={{ fontSize: "0.875rem" }}>{l.nav.docs}</a>
-          <div style={{ display: "inline-flex", borderRadius: 6, border: "1px solid #2a2d42", overflow: "hidden", alignSelf: "flex-start" }}>
-            {locales.map((loc) => (
-              <a key={loc.code} href={loc.path} style={{
-                padding: "4px 12px",
-                fontSize: "0.8125rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                color: locale === loc.code ? "#f2f3f7" : "#5a5f7d",
-                backgroundColor: locale === loc.code ? "rgba(99,102,241,0.15)" : "transparent",
-              }}>{loc.label}</a>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={{ fontSize: "0.875rem", color: "#5a5f7d" }}>{locales.find((loc) => loc.code === locale)?.label}</span>
+            {locales.filter((loc) => loc.code !== locale).map((loc) => (
+              <a key={loc.code} href={loc.path} className="nav-link" style={{ fontSize: "0.875rem" }}>{loc.label}</a>
             ))}
           </div>
           {user ? (
