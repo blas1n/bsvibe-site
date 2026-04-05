@@ -214,7 +214,7 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
         <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="#products" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.products}</a>
           <a href={`${docsBase}/bsgateway/getting-started`} className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.docs}</a>
-          <a href="https://auth.bsvibe.dev/signup" style={{
+          <a href="https://auth.bsvibe.dev/signup?redirect_uri=https%3A%2F%2Fgateway.bsvibe.dev%2Fauth%2Fcallback" style={{
             padding: "6px 16px",
             borderRadius: 8,
             backgroundColor: "rgba(99,102,241,0.10)",
@@ -225,7 +225,7 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
           }}>
             {l.nav.getStarted}
           </a>
-          <a href="https://auth.bsvibe.dev/login" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.login}</a>
+          <a href="https://auth.bsvibe.dev/login?redirect_uri=https%3A%2F%2Fgateway.bsvibe.dev%2Fauth%2Fcallback" className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>{l.nav.login}</a>
         </div>
 
         {/* Mobile hamburger */}
@@ -380,7 +380,7 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
             }}>
               {l.hero.cta}
             </a>
-            <a href="https://auth.bsvibe.dev/signup" className="cta-secondary" style={{
+            <a href="https://auth.bsvibe.dev/signup?redirect_uri=https%3A%2F%2Fgateway.bsvibe.dev%2Fauth%2Fcallback" className="cta-secondary" style={{
               display: "inline-block",
               padding: "13px 28px",
               borderRadius: 10,
