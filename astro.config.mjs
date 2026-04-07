@@ -82,6 +82,7 @@ export default defineConfig({
           translations: { en: 'Guides' },
           items: [
             { label: 'Auth 마이그레이션', slug: 'auth-migration-guide', translations: { en: 'Auth Migration' } },
+            { label: '결제 시스템 설정', slug: 'payment-setup-guide', translations: { en: 'Payment Setup' } },
           ],
         },
       ],

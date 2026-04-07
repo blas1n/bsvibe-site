@@ -5,6 +5,7 @@ export interface Translations {
     products: string;
     docs: string;
     blog: string;
+    pricing: string;
     getStarted: string;
     login: string;
     logout: string;

@@ -1,0 +1,99 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import PricingTable from '@/components/PricingTable.astro';
+import { getPricing } from '@/data/pricing';
+
+const pricing = getPricing('en');
+---
+
+<MainLayout title="Pricing — BSVibe" description="BSVibe product pricing plans" locale="en">
+  <div class="pricing-page">
+    <div class="pricing-header">
+      <h1>Simple pricing, transparent costs</h1>
+      <p>Every product starts free. Pay only for what you use.</p>
+    </div>
+
+    {pricing.map(p => <PricingTable pricing={p} />)}
+
+    <div class="pricing-faq">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Are there limits on the free plan?</h3>
+          <p>Free plans are designed for personal projects and small-scale usage. There are usage limits, but all core features are available.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What payment methods do you accept?</h3>
+          <p>In Korea, we support cards, KakaoPay, and NaverPay via Toss Payments. Internationally, we accept major cards via Stripe.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I change my plan?</h3>
+          <p>You can upgrade or downgrade anytime. Charges are prorated accordingly.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What's your refund policy?</h3>
+          <p>When you cancel, you retain access until the end of your current billing period. We do not offer prorated refunds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .pricing-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px 24px 120px;
+  }
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .pricing-header h1 {
+    color: #f2f3f7;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  .pricing-header p {
+    color: #8187a8;
+    font-size: 1.0625rem;
+  }
+  .pricing-faq {
+    margin-top: 32px;
+    padding-top: 48px;
+    border-top: 1px solid #1e2033;
+  }
+  .pricing-faq h2 {
+    color: #f2f3f7;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 32px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .faq-item {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+  }
+  .faq-item h3 {
+    color: #e4e6ee;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .faq-item p {
+    color: #8187a8;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>

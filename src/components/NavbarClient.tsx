@@ -69,6 +69,7 @@ export default function NavbarClient({ locale = 'ko' }: { locale?: Locale }) {
           <a href="#products" className="nav-link" style={{ fontSize: '0.8125rem', fontWeight: 500 }}>{l.nav.products}</a>
           <a href={`${prefix}/bsgateway/getting-started`} className="nav-link" style={{ fontSize: '0.8125rem', fontWeight: 500 }}>{l.nav.docs}</a>
           <a href={`${prefix}/blog`} className="nav-link" style={{ fontSize: '0.8125rem', fontWeight: 500 }}>{l.nav.blog}</a>
+          <a href={`${prefix}/pricing`} className="nav-link" style={{ fontSize: '0.8125rem', fontWeight: 500 }}>{l.nav.pricing}</a>
 
           {/* Language switcher */}
           <div style={{ position: 'relative' }}>
@@ -140,6 +141,7 @@ export default function NavbarClient({ locale = 'ko' }: { locale?: Locale }) {
           <a href="#products" className="nav-link" onClick={() => setMenuOpen(false)} style={{ fontSize: '0.875rem' }}>{l.nav.products}</a>
           <a href={`${prefix}/bsgateway/getting-started`} className="nav-link" style={{ fontSize: '0.875rem' }}>{l.nav.docs}</a>
           <a href={`${prefix}/blog`} className="nav-link" style={{ fontSize: '0.875rem' }}>{l.nav.blog}</a>
+          <a href={`${prefix}/pricing`} className="nav-link" style={{ fontSize: '0.875rem' }}>{l.nav.pricing}</a>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span style={{ fontSize: '0.875rem', color: '#5a5f7d' }}>{locales.find(loc => loc.code === locale)?.label}</span>
             {locales.filter(loc => loc.code !== locale).map(loc => (

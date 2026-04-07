@@ -1,7 +1,7 @@
 import type { Translations } from './index';
 
 export const en: Translations = {
-  nav: { products: 'Products', docs: 'Docs', blog: 'Blog', getStarted: 'Get Started', login: 'Log in', logout: 'Log out', account: 'Account' },
+  nav: { products: 'Products', docs: 'Docs', blog: 'Blog', pricing: 'Pricing', getStarted: 'Get Started', login: 'Log in', logout: 'Log out', account: 'Account' },
   menu: 'Menu',
   hero: {
     badge: 'AI, a new sense',

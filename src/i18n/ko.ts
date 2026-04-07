@@ -1,7 +1,7 @@
 import type { Translations } from './index';
 
 export const ko: Translations = {
-  nav: { products: '제품', docs: '문서', blog: '블로그', getStarted: '시작하기', login: '로그인', logout: '로그아웃', account: '내 계정' },
+  nav: { products: '제품', docs: '문서', blog: '블로그', pricing: '가격', getStarted: '시작하기', login: '로그인', logout: '로그아웃', account: '내 계정' },
   menu: '메뉴',
   hero: {
     badge: 'AI, 새로운 감각',

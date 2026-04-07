@@ -1,0 +1,131 @@
+---
+title: 결제 시스템 설정 가이드
+description: 토스페이먼츠 및 Stripe 결제 연동을 위한 설정 가이드
+---
+
+## 개요
+
+bsvibe-site는 이중 결제 시스템을 지원합니다:
+- **한국 사용자**: 토스페이먼츠 (카드, 카카오페이, 네이버페이)
+- **해외 사용자**: Stripe (주요 카드)
+
+## 사전 준비
+
+### 1. 토스페이먼츠
+
+1. [토스페이먼츠 개발자센터](https://developers.tosspayments.com) 회원가입
+2. **테스트 키** 발급:
+   - 시크릿 키: `test_sk_...`
+   - 클라이언트 키: `test_ck_...`
+3. **프로덕션 키**는 심사 승인 후 발급
+
+### 2. Stripe
+
+1. [Stripe Dashboard](https://dashboard.stripe.com) 회원가입
+2. **테스트 키** 발급:
+   - Secret key: `sk_test_...`
+   - Publishable key: `pk_test_...`
+3. **Products & Prices** 생성:
+   - BSGateway Free / Pro / Enterprise
+   - BSNexus Free / Pro / Enterprise
+   - BSupervisor Free / Pro / Enterprise
+   - BSage Free / Pro / Enterprise
+
+## 환경 변수 설정
+
+`.env` 파일에 추가:
+
+```bash
+# 토스페이먼츠
+TOSS_SECRET_KEY=test_sk_...
+TOSS_CLIENT_KEY=test_ck_...
+TOSS_WEBHOOK_SECRET=...
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+## 웹훅 설정
+
+### 토스페이먼츠 웹훅
+
+1. 토스 개발자센터 → 웹훅 설정
+2. URL: `https://bsvibe.dev/api/payment/webhook`
+3. 이벤트: `DONE` (결제 완료), `CANCELED` (취소), `PARTIAL_CANCELED` (부분 취소)
+
+### Stripe 웹훅
+
+1. Stripe Dashboard → Developers → Webhooks
+2. URL: `https://bsvibe.dev/api/payment/webhook`
+3. Events:
+   - `invoice.paid` — 구독 결제 성공
+   - `invoice.payment_failed` — 결제 실패
+   - `customer.subscription.created` — 구독 생성
+   - `customer.subscription.updated` — 구독 변경
+   - `customer.subscription.deleted` — 구독 취소
+
+로컬 개발 시:
+```bash
+stripe listen --forward-to localhost:4321/api/payment/webhook
+```
+
+## SDK 설치
+
+```bash
+# 토스페이먼츠
+npm install @tosspayments/payment-sdk
+
+# Stripe
+npm install stripe @stripe/stripe-js
+```
+
+## 구현 체크리스트
+
+### 서버사이드 (`src/lib/payment.server.ts`)
+
+- [ ] `createCheckout()` — 토스/Stripe 결제 세션 생성 구현
+- [ ] `getSubscription()` — DB에서 구독 상태 조회 구현
+- [ ] `cancelSubscription()` — 토스/Stripe 구독 취소 API 호출
+- [ ] `getPaymentHistory()` — 결제 내역 조회
+- [ ] `verifyWebhook()` — 웹훅 서명 검증
+
+### API Routes (`src/pages/api/payment/`)
+
+- [ ] `checkout.ts` — `createCheckout()` 호출 후 결제 URL 반환
+- [ ] `webhook.ts` — 이벤트별 핸들러 구현 (구독 활성화/비활성화)
+- [ ] `subscription.ts` — 구독 조회/취소 실제 연동
+
+### 프론트엔드
+
+- [ ] `account/billing.astro` — 현재 구독 표시, 결제 수단 관리 UI
+- [ ] `account/usage.astro` — BSGateway API에서 사용량 데이터 fetch
+- [ ] 토스 결제 위젯 SDK 클라이언트 연동 (한국)
+- [ ] Stripe Checkout 또는 Elements 연동 (해외)
+
+### 데이터베이스
+
+- [ ] `subscriptions` 테이블 생성 (user_id, provider, provider_subscription_id, status, plan, current_period_end)
+- [ ] `payment_history` 테이블 생성 (user_id, provider, amount, currency, status, created_at)
+- [ ] 웹훅에서 DB 업데이트 로직 구현
+
+## 테스트
+
+### 토스페이먼츠 테스트 카드
+- 카드번호: `4330000000000001`
+- 유효기간: 아무 날짜 (미래)
+- CVC: 아무 3자리
+- 비밀번호: 아무 2자리
+
+### Stripe 테스트 카드
+- 성공: `4242 4242 4242 4242`
+- 실패: `4000 0000 0000 0002`
+- 3D Secure: `4000 0025 0000 3155`
+
+## 아키텍처 결정 기록
+
+- **이중 결제**: 한국 시장 (토스) + 글로벌 (Stripe) 동시 지원. `getProvider(locale)` 로 자동 분기
+- **서버사이드 전용**: 결제 시크릿 키는 서버에만 존재. 클라이언트에 노출 없음
+- **웹훅 우선**: 결제 상태는 웹훅으로 최종 확인. 클라이언트 콜백은 UX용일 뿐
+- **DB 필수**: 구독 상태를 자체 DB에 저장. 결제 서비스 API만으로는 빠른 조회 어려움
