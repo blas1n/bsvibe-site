@@ -1,0 +1,64 @@
+---
+import type { Locale } from '@/i18n';
+import { getTranslations, getLocalePrefix } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const l = getTranslations(locale);
+const prefix = getLocalePrefix(locale);
+---
+
+<footer class="footer">
+  <div class="footer-left">
+    <img src="/images/bsvibe-logo.png" alt="BSVibe" width="16" height="16" style="border-radius: 2px;" />
+    <span class="footer-brand">BSVibe</span>
+    <span class="footer-copy">&copy; 2026</span>
+  </div>
+  <div class="footer-links">
+    <a href={`${prefix}/bsgateway/getting-started`} class="nav-link">{l.footer.docs}</a>
+    <a href={`${prefix}/privacy`} class="nav-link">{l.footer.privacy}</a>
+    <a href={`${prefix}/terms`} class="nav-link">{l.footer.terms}</a>
+    <a href="https://github.com/BSVibe" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a href="mailto:contact@bsvibe.dev" class="nav-link">contact@bsvibe.dev</a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid #1e2033;
+    padding: 40px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 960px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .footer-brand {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #5a5f7d;
+  }
+  .footer-copy {
+    font-size: 0.75rem;
+    color: #3d4160;
+    margin-left: 4px;
+  }
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-links a {
+    font-size: 0.8125rem;
+  }
+</style>

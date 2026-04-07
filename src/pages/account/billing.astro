@@ -1,0 +1,37 @@
+---
+export const prerender = false;
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout title="결제 관리 — BSVibe" locale="ko">
+  <h1 class="page-title">결제 관리</h1>
+  <p class="page-desc">구독, 결제 수단, 결제 내역을 관리합니다.</p>
+  <div class="coming-soon">
+    <p>준비 중입니다.</p>
+  </div>
+</DashboardLayout>
+
+<style>
+  .page-title {
+    color: #f2f3f7;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .page-desc {
+    color: #8187a8;
+    font-size: 0.9375rem;
+    margin-bottom: 32px;
+  }
+  .coming-soon {
+    padding: 48px;
+    border-radius: 12px;
+    border: 1px dashed #2a2d42;
+    text-align: center;
+  }
+  .coming-soon p {
+    color: #5a5f7d;
+    font-size: 0.9375rem;
+  }
+</style>

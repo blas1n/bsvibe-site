@@ -1,0 +1,81 @@
+---
+import type { Locale } from '@/i18n';
+import { getTranslations } from '@/i18n';
+import { productsMeta } from '@/data/products';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const l = getTranslations(locale);
+---
+
+<section id="products" class="products-section">
+  <div class="fade-up products-heading" style="animation-delay: 0.7s;">
+    <h2>{l.productsHeading}</h2>
+  </div>
+
+  <div class="products-grid">
+    {productsMeta.map((p, i) => (
+      <ProductCard
+        product={p}
+        detail={l.products[p.name].detail}
+        desc={l.products[p.name].desc}
+        index={i}
+      />
+    ))}
+  </div>
+
+  <div class="unified-badge">
+    <div class="badge-line" />
+    <span>unified by bsvibe</span>
+    <div class="badge-line" />
+  </div>
+</section>
+
+<style>
+  .products-section {
+    padding: 0 24px 120px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .products-heading {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .products-heading h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f2f3f7;
+    margin: 0 0 10px;
+    letter-spacing: -0.025em;
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .unified-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+    color: #3d4160;
+    font-size: 0.75rem;
+  }
+  .unified-badge span {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .badge-line {
+    height: 1px;
+    flex: 1;
+    max-width: 80px;
+    background-color: #2a2d42;
+  }
+</style>

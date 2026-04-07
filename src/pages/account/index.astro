@@ -1,0 +1,76 @@
+---
+export const prerender = false;
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+const user = Astro.locals.user!;
+---
+
+<DashboardLayout title="대시보드 — BSVibe" locale="ko">
+  <h1 class="page-title">안녕하세요, {user.email}</h1>
+  <p class="page-desc">BSVibe 대시보드에 오신 것을 환영합니다.</p>
+
+  <div class="cards">
+    <a href="/account/profile" class="dash-card">
+      <h3>프로필</h3>
+      <p>계정 정보를 관리합니다</p>
+    </a>
+    <a href="/account/billing" class="dash-card">
+      <h3>결제</h3>
+      <p>구독과 결제 수단을 관리합니다</p>
+    </a>
+    <a href="/account/usage" class="dash-card">
+      <h3>사용량</h3>
+      <p>API 사용량과 비용을 확인합니다</p>
+    </a>
+    <a href="/account/api-keys" class="dash-card">
+      <h3>API 키</h3>
+      <p>API 키를 생성하고 관리합니다</p>
+    </a>
+    <a href="/account/team" class="dash-card">
+      <h3>팀</h3>
+      <p>팀원을 초대하고 권한을 관리합니다</p>
+    </a>
+  </div>
+</DashboardLayout>
+
+<style>
+  .page-title {
+    color: #f2f3f7;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .page-desc {
+    color: #8187a8;
+    font-size: 0.9375rem;
+    margin-bottom: 32px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .dash-card {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .dash-card:hover {
+    border-color: rgba(99,102,241,0.3);
+    transform: translateY(-2px);
+  }
+  .dash-card h3 {
+    color: #f2f3f7;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .dash-card p {
+    color: #5a5f7d;
+    font-size: 0.8125rem;
+    margin: 0;
+  }
+</style>

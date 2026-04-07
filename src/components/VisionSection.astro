@@ -1,0 +1,45 @@
+---
+import type { Locale } from '@/i18n';
+import { getTranslations } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const l = getTranslations(locale);
+---
+
+<section class="vision">
+  <div class="fade-up" style="animation-delay: 1.2s;">
+    <blockquote class="vision-quote">
+      <span class="quote-mark">"</span>
+      {' '}{l.vision}{' '}
+      <span class="quote-mark">"</span>
+    </blockquote>
+  </div>
+</section>
+
+<style>
+  .vision {
+    padding: 80px 24px;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .vision-quote {
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+    font-weight: 500;
+    color: #a8adc6;
+    line-height: 1.8;
+    margin: 0;
+    font-style: normal;
+    letter-spacing: -0.01em;
+  }
+  .quote-mark {
+    color: #6366f1;
+    font-size: 1.5em;
+    line-height: 0;
+    vertical-align: middle;
+  }
+</style>

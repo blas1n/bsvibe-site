@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import NavbarClient from '@/components/NavbarClient.tsx';
+import Footer from '@/components/Footer.astro';
+import type { Locale } from '@/i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  locale?: Locale;
+  ogUrl?: string;
+  ogImage?: string;
+}
+
+const { title, description, locale = 'ko', ogUrl, ogImage } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} locale={locale} ogUrl={ogUrl} ogImage={ogImage}>
+  <NavbarClient locale={locale} client:load />
+  <main style="padding-top: 64px;">
+    <slot />
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>

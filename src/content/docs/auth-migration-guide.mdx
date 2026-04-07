@@ -1,0 +1,180 @@
+---
+title: 서버사이드 Auth 마이그레이션 가이드
+description: BSVibe 제품의 클라이언트사이드 auth에서 서버사이드 auth로 전환하는 가이드
+---
+
+## 개요
+
+BSVibe 생태계의 기존 인증 방식은 **클라이언트사이드** (localStorage + hash fragment)입니다. 
+bsvibe-site는 보안 강화를 위해 **서버사이드 httpOnly 쿠키 기반 인증**으로 전환했습니다.
+
+이 문서는 다른 BSVibe 제품 (BSGateway, BSNexus, BSupervisor, BSage)이 동일한 패턴으로 마이그레이션할 때 참고하는 가이드입니다.
+
+## 기존 방식의 보안 취약점
+
+### localStorage에 토큰 저장
+
+```
+// 기존: XSS 공격 시 토큰 탈취 가능
+localStorage.setItem('bsvibe_user', JSON.stringify({
+  accessToken: '...',
+  refreshToken: '...',
+}));
+```
+
+- XSS 취약점이 하나라도 있으면 모든 토큰이 노출됨
+- 제3자 스크립트가 localStorage에 접근 가능
+- 보호 페이지의 HTML이 인증 없이 다운로드됨 (JS 로드 후에야 리다이렉트)
+
+## 서버사이드 인증 아키텍처
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Browser    │────▶│  BSVibe App  │────▶│ auth.bsvibe  │
+│              │     │  (Server)    │     │   .dev       │
+│              │◀────│              │◀────│              │
+└──────────────┘     └──────────────┘     └──────────────┘
+     cookie            middleware          /api/session
+  (httpOnly)           validates           refreshes
+```
+
+### 핵심 원칙
+
+1. **토큰은 서버에만** — 클라이언트는 httpOnly 쿠키만 보유 (JS에서 접근 불가)
+2. **서버 미들웨어** — 보호 라우트 접근 시 서버에서 세션 검증
+3. **토큰 갱신** — `auth.bsvibe.dev/api/session` GET으로 access token 갱신
+4. **쿠키 로테이션** — 갱신 시 새 refresh token으로 쿠키 자동 교체
+
+## 인증 흐름
+
+### 1. 로그인
+
+```
+사용자 → auth.bsvibe.dev/login → Supabase 인증
+                                     ↓
+사용자 ← /auth/callback#access_token=...&refresh_token=...
+                                     ↓
+클라이언트 JS: hash에서 토큰 추출 → POST /api/auth/session { refresh_token }
+                                     ↓
+서버: httpOnly 쿠키 설정 → 302 /account
+```
+
+### 2. 보호 페이지 접근
+
+```
+사용자 → /account
+                                     ↓
+미들웨어: bsvibe_session 쿠키 확인
+  ├─ 없음 → 302 auth.bsvibe.dev/login
+  └─ 있음 → auth.bsvibe.dev/api/session GET (토큰 갱신)
+              ├─ 실패 → 쿠키 삭제 + 302 login
+              └─ 성공 → JWT 디코드 → Astro.locals.user 주입 → 페이지 렌더
+```
+
+### 3. 로그아웃
+
+```
+DELETE /api/auth/session → 쿠키 삭제 → 302 /
+```
+
+## 구현 참조: bsvibe-site (Astro)
+
+### 서버사이드 유틸리티
+
+`src/lib/auth.server.ts`:
+
+```typescript
+// 쿠키에서 세션 검증
+export async function validateSession(cookieHeader: string | null): Promise<{
+  user: AuthUser | null;
+  newCookie?: string;
+}> { ... }
+
+// 쿠키 생성/삭제
+export function createSessionCookie(refreshToken: string): string { ... }
+export function clearSessionCookie(): string { ... }
+```
+
+### 미들웨어
+
+`src/middleware.ts`:
+
+```typescript
+export const onRequest = defineMiddleware(async (context, next) => {
+  if (!isProtectedPath(pathname)) return next();
+  
+  const { user, newCookie } = await validateSession(cookieHeader);
+  if (!user) return context.redirect(loginUrl, 302);
+  
+  context.locals.user = user;
+  const response = await next();
+  if (newCookie) response.headers.append('Set-Cookie', newCookie);
+  return response;
+});
+```
+
+### API 라우트
+
+`src/pages/api/auth/session.ts`:
+
+- `GET` — 현재 세션 상태 (Navbar용)
+- `POST { refresh_token }` — httpOnly 쿠키 설정
+- `DELETE` — 쿠키 삭제 (로그아웃)
+
+## React + Vite 프로젝트 마이그레이션
+
+현재 BSGateway, BSNexus 등은 React SPA + Vite입니다. 서버사이드 쿠키를 사용하려면:
+
+### 옵션 A: Vite 프록시 + 별도 세션 서비스
+
+```typescript
+// vite.config.ts — 개발 시 API 프록시
+server: {
+  proxy: {
+    '/api/auth': 'https://bsvibe.dev',  // bsvibe-site의 auth API 활용
+  }
+}
+```
+
+프로덕션에서는 Vercel Edge Function 또는 Caddy 리버스 프록시로 `/api/auth/*`를 처리.
+
+### 옵션 B: 각 제품에 자체 세션 API 구현
+
+FastAPI 백엔드가 있는 제품은 백엔드에서 직접 httpOnly 쿠키를 관리.
+
+```python
+# FastAPI 예시
+@router.post("/api/auth/session")
+async def set_session(body: SessionRequest, response: Response):
+    response.set_cookie(
+        "bsvibe_session",
+        body.refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=30 * 24 * 60 * 60,
+    )
+```
+
+## 마이그레이션 체크리스트
+
+- [ ] `/auth/callback` 페이지에서 토큰을 서버로 전달 (POST)
+- [ ] 서버에서 httpOnly 쿠키 설정
+- [ ] localStorage에서 `bsvibe_user` 항목 제거
+- [ ] `useAuth` 훅을 `/api/auth/session` GET 기반으로 변경
+- [ ] CORS 설정 확인 (쿠키 전달을 위해 `credentials: 'include'` 필요)
+- [ ] 보호 라우트에 서버사이드 인증 체크 추가
+- [ ] `@bsvibe/auth` SDK에서 `handleCallback()` 제거 (서버에서 처리)
+- [ ] E2E 테스트: 로그인 → 보호 페이지 → 로그아웃 흐름 검증
+
+## 쿠키 사양
+
+| 속성 | 값 |
+|------|-----|
+| Name | `bsvibe_session` |
+| Value | Refresh token (Supabase 발급) |
+| HttpOnly | `true` |
+| Secure | `true` |
+| SameSite | `Lax` |
+| Path | `/` |
+| Max-Age | 2,592,000 (30일) |

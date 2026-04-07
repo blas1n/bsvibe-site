@@ -1,0 +1,78 @@
+---
+import MainLayout from './MainLayout.astro';
+import type { Locale } from '@/i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  locale?: Locale;
+}
+
+const { title, description, locale = 'ko' } = Astro.props;
+const prefix = locale === 'en' ? '/en' : '';
+const backLabel = locale === 'en' ? '← BSVibe Home' : '← BSVibe 홈으로';
+---
+
+<MainLayout title={title} description={description} locale={locale}>
+  <div class="legal-container">
+    <a href={prefix || '/'} class="back-link">{backLabel}</a>
+    <slot />
+  </div>
+</MainLayout>
+
+<style>
+  .legal-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 24px 120px;
+  }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 32px;
+    color: #8187a8;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    color: #f2f3f7;
+  }
+  .legal-container :global(h1) {
+    color: #f2f3f7;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.03em;
+  }
+  .legal-container :global(.updated) {
+    color: #5a5f7d;
+    font-size: 0.875rem;
+    margin-bottom: 48px;
+  }
+  .legal-container :global(h2) {
+    color: #e4e6ee;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 40px 0 16px;
+    letter-spacing: -0.02em;
+  }
+  .legal-container :global(p),
+  .legal-container :global(li) {
+    margin-bottom: 12px;
+    font-size: 0.9375rem;
+    color: #a8adc6;
+    line-height: 1.8;
+  }
+  .legal-container :global(ul) {
+    padding-left: 20px;
+  }
+  .legal-container :global(a) {
+    color: #818cf8;
+    text-decoration: none;
+  }
+  .legal-container :global(a:hover) {
+    text-decoration: underline;
+  }
+  .legal-container :global(strong) {
+    color: #e4e6ee;
+  }
+</style>

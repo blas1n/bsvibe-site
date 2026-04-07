@@ -1,0 +1,181 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { Locale } from '@/i18n';
+import type { AuthUser } from '@/lib/auth.server';
+
+export const prerender = false;
+
+interface Props {
+  title: string;
+  locale?: Locale;
+}
+
+const { title, locale = 'ko' } = Astro.props;
+const user = Astro.locals.user as AuthUser;
+const prefix = locale === 'en' ? '/en' : '';
+
+const sidebarItems = locale === 'en'
+  ? [
+      { href: `${prefix}/account`, label: 'Overview', icon: 'home' },
+      { href: `${prefix}/account/profile`, label: 'Profile', icon: 'user' },
+      { href: `${prefix}/account/billing`, label: 'Billing', icon: 'credit-card' },
+      { href: `${prefix}/account/usage`, label: 'Usage', icon: 'bar-chart' },
+      { href: `${prefix}/account/api-keys`, label: 'API Keys', icon: 'key' },
+      { href: `${prefix}/account/team`, label: 'Team', icon: 'users' },
+    ]
+  : [
+      { href: `${prefix}/account`, label: '개요', icon: 'home' },
+      { href: `${prefix}/account/profile`, label: '프로필', icon: 'user' },
+      { href: `${prefix}/account/billing`, label: '결제', icon: 'credit-card' },
+      { href: `${prefix}/account/usage`, label: '사용량', icon: 'bar-chart' },
+      { href: `${prefix}/account/api-keys`, label: 'API 키', icon: 'key' },
+      { href: `${prefix}/account/team`, label: '팀', icon: 'users' },
+    ];
+
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout title={title} description="BSVibe Dashboard" locale={locale}>
+  <div class="dashboard">
+    {/* Top bar */}
+    <header class="dashboard-header">
+      <a href={prefix || '/'} class="logo-link">
+        <img src="/images/bsvibe-logo.png" alt="BSVibe" width="22" height="22" style="border-radius: 4px;" />
+        <span class="logo-text">BSVibe</span>
+      </a>
+      <div class="header-right">
+        <span class="user-email">{user?.email}</span>
+        <a href="/api/auth/session" class="logout-link" data-logout>
+          {locale === 'en' ? 'Log out' : '로그아웃'}
+        </a>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+      {/* Sidebar */}
+      <aside class="sidebar">
+        <nav>
+          {sidebarItems.map(item => (
+            <a
+              href={item.href}
+              class:list={['sidebar-link', { active: currentPath === item.href || (item.href !== `${prefix}/account` && currentPath.startsWith(item.href)) }]}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main class="dashboard-main">
+        <slot />
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelector('[data-logout]')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await fetch('/api/auth/session', { method: 'DELETE' });
+    window.location.href = '/';
+  });
+</script>
+
+<style>
+  .dashboard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .dashboard-header {
+    height: 56px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1e2033;
+    background-color: rgba(10,11,15,0.95);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .logo-text {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #f2f3f7;
+    letter-spacing: -0.02em;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .user-email {
+    font-size: 0.8125rem;
+    color: #818cf8;
+    font-weight: 500;
+  }
+  .logout-link {
+    font-size: 0.8125rem;
+    color: #8187a8;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .logout-link:hover {
+    color: #f2f3f7;
+  }
+  .dashboard-body {
+    display: flex;
+    flex: 1;
+  }
+  .sidebar {
+    width: 220px;
+    border-right: 1px solid #1e2033;
+    padding: 16px 12px;
+    flex-shrink: 0;
+  }
+  .sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-link {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #8187a8;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .sidebar-link:hover {
+    color: #f2f3f7;
+    background-color: rgba(99,102,241,0.06);
+  }
+  .sidebar-link.active {
+    color: #f2f3f7;
+    background-color: rgba(99,102,241,0.1);
+    font-weight: 500;
+  }
+  .dashboard-main {
+    flex: 1;
+    padding: 32px;
+    max-width: 900px;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+    .dashboard-main {
+      padding: 24px 16px;
+    }
+  }
+</style>

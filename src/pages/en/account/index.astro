@@ -1,0 +1,76 @@
+---
+export const prerender = false;
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+const user = Astro.locals.user!;
+---
+
+<DashboardLayout title="Dashboard — BSVibe" locale="en">
+  <h1 class="page-title">Hello, {user.email}</h1>
+  <p class="page-desc">Welcome to your BSVibe dashboard.</p>
+
+  <div class="cards">
+    <a href="/en/account/profile" class="dash-card">
+      <h3>Profile</h3>
+      <p>Manage your account information</p>
+    </a>
+    <a href="/en/account/billing" class="dash-card">
+      <h3>Billing</h3>
+      <p>Manage subscriptions and payment methods</p>
+    </a>
+    <a href="/en/account/usage" class="dash-card">
+      <h3>Usage</h3>
+      <p>View API usage and costs</p>
+    </a>
+    <a href="/en/account/api-keys" class="dash-card">
+      <h3>API Keys</h3>
+      <p>Create and manage API keys</p>
+    </a>
+    <a href="/en/account/team" class="dash-card">
+      <h3>Team</h3>
+      <p>Invite members and manage permissions</p>
+    </a>
+  </div>
+</DashboardLayout>
+
+<style>
+  .page-title {
+    color: #f2f3f7;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .page-desc {
+    color: #8187a8;
+    font-size: 0.9375rem;
+    margin-bottom: 32px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .dash-card {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .dash-card:hover {
+    border-color: rgba(99,102,241,0.3);
+    transform: translateY(-2px);
+  }
+  .dash-card h3 {
+    color: #f2f3f7;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .dash-card p {
+    color: #5a5f7d;
+    font-size: 0.8125rem;
+    margin: 0;
+  }
+</style>

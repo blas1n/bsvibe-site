@@ -1,115 +1,64 @@
 ---
+import LegalLayout from '@/layouts/LegalLayout.astro';
 ---
 
-<!doctype html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>이용약관 — BSVibe</title>
-    <meta name="description" content="BSVibe 이용약관" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body {
-        background-color: #0a0b0f;
-        color: #a8adc6;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        line-height: 1.8;
-      }
-      .container {
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 80px 24px 120px;
-      }
-      h1 {
-        color: #f2f3f7;
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-        letter-spacing: -0.03em;
-      }
-      .updated {
-        color: #5a5f7d;
-        font-size: 0.875rem;
-        margin-bottom: 48px;
-      }
-      h2 {
-        color: #e4e6ee;
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 40px 0 16px;
-        letter-spacing: -0.02em;
-      }
-      p, li { margin-bottom: 12px; font-size: 0.9375rem; }
-      ul { padding-left: 20px; }
-      a { color: #818cf8; text-decoration: none; }
-      a:hover { text-decoration: underline; }
-      .back { display: inline-block; margin-bottom: 32px; color: #8187a8; font-size: 0.875rem; }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <a href="/" class="back">&larr; BSVibe 홈으로</a>
-      <h1>이용약관</h1>
-      <p class="updated">최종 수정일: 2026년 4월 2일</p>
+<LegalLayout title="이용약관 — BSVibe" description="BSVibe 이용약관" locale="ko">
+  <h1>이용약관</h1>
+  <p class="updated">최종 수정일: 2026년 4월 2일</p>
 
-      <h2>제1조 (목적)</h2>
-      <p>이 약관은 BSVibe(이하 "서비스")가 제공하는 AI 소프트웨어 서비스의 이용조건 및 절차를 규정하는 것을 목적으로 합니다.</p>
+  <h2>제1조 (목적)</h2>
+  <p>이 약관은 BSVibe(이하 "서비스")가 제공하는 AI 소프트웨어 서비스의 이용조건 및 절차를 규정하는 것을 목적으로 합니다.</p>
 
-      <h2>제2조 (서비스의 내용)</h2>
-      <p>BSVibe는 다음의 서비스를 제공합니다:</p>
-      <ul>
-        <li><strong>BSGateway</strong>: LLM API 라우팅 및 비용 최적화</li>
-        <li><strong>BSNexus</strong>: AI 에이전트 오케스트레이션</li>
-        <li><strong>BSupervisor</strong>: AI 에이전트 감사 및 안전 관리</li>
-        <li><strong>BSage</strong>: 온톨로지 기반 지식 관리</li>
-      </ul>
+  <h2>제2조 (서비스의 내용)</h2>
+  <p>BSVibe는 다음의 서비스를 제공합니다:</p>
+  <ul>
+    <li><strong>BSGateway</strong>: LLM API 라우팅 및 비용 최적화</li>
+    <li><strong>BSNexus</strong>: AI 에이전트 오케스트레이션</li>
+    <li><strong>BSupervisor</strong>: AI 에이전트 감사 및 안전 관리</li>
+    <li><strong>BSage</strong>: 온톨로지 기반 지식 관리</li>
+  </ul>
 
-      <h2>제3조 (이용 계약의 성립)</h2>
-      <p>이용 계약은 이용자가 계정을 생성하고 이 약관에 동의한 시점에 성립됩니다.</p>
+  <h2>제3조 (이용 계약의 성립)</h2>
+  <p>이용 계약은 이용자가 계정을 생성하고 이 약관에 동의한 시점에 성립됩니다.</p>
 
-      <h2>제4조 (이용자의 의무)</h2>
-      <ul>
-        <li>타인의 개인정보를 무단으로 수집하거나 이용하지 않아야 합니다.</li>
-        <li>서비스를 이용하여 불법적인 활동을 하지 않아야 합니다.</li>
-        <li>API 키를 안전하게 관리하고 제3자에게 공유하지 않아야 합니다.</li>
-        <li>서비스의 정상적인 운영을 방해하는 행위를 하지 않아야 합니다.</li>
-      </ul>
+  <h2>제4조 (이용자의 의무)</h2>
+  <ul>
+    <li>타인의 개인정보를 무단으로 수집하거나 이용하지 않아야 합니다.</li>
+    <li>서비스를 이용하여 불법적인 활동을 하지 않아야 합니다.</li>
+    <li>API 키를 안전하게 관리하고 제3자에게 공유하지 않아야 합니다.</li>
+    <li>서비스의 정상적인 운영을 방해하는 행위를 하지 않아야 합니다.</li>
+  </ul>
 
-      <h2>제5조 (서비스 제공자의 의무)</h2>
-      <ul>
-        <li>안정적인 서비스 운영을 위해 최선을 다합니다.</li>
-        <li>이용자의 개인정보를 안전하게 관리합니다.</li>
-        <li>서비스 변경 시 사전 공지합니다.</li>
-      </ul>
+  <h2>제5조 (서비스 제공자의 의무)</h2>
+  <ul>
+    <li>안정적인 서비스 운영을 위해 최선을 다합니다.</li>
+    <li>이용자의 개인정보를 안전하게 관리합니다.</li>
+    <li>서비스 변경 시 사전 공지합니다.</li>
+  </ul>
 
-      <h2>제6조 (서비스의 변경 및 중단)</h2>
-      <p>서비스는 운영상, 기술상의 이유로 변경되거나 일시적으로 중단될 수 있습니다. 중대한 변경이 있을 경우 최소 7일 전에 공지합니다.</p>
+  <h2>제6조 (서비스의 변경 및 중단)</h2>
+  <p>서비스는 운영상, 기술상의 이유로 변경되거나 일시적으로 중단될 수 있습니다. 중대한 변경이 있을 경우 최소 7일 전에 공지합니다.</p>
 
-      <h2>제7조 (이용 요금)</h2>
-      <p>각 서비스의 이용 요금은 별도로 공지합니다. 무료 체험 기간이 제공될 수 있으며, 이후 유료 전환 시 사전 안내합니다.</p>
+  <h2>제7조 (이용 요금)</h2>
+  <p>각 서비스의 이용 요금은 별도로 공지합니다. 무료 체험 기간이 제공될 수 있으며, 이후 유료 전환 시 사전 안내합니다.</p>
 
-      <h2>제8조 (계약 해지)</h2>
-      <p>이용자는 언제든지 계정 설정에서 서비스 이용을 해지할 수 있습니다. 해지 시 데이터는 30일 이내에 삭제됩니다.</p>
+  <h2>제8조 (계약 해지)</h2>
+  <p>이용자는 언제든지 계정 설정에서 서비스 이용을 해지할 수 있습니다. 해지 시 데이터는 30일 이내에 삭제됩니다.</p>
 
-      <h2>제9조 (면책 조항)</h2>
-      <ul>
-        <li>AI 모델의 출력에 대해서는 정확성을 보장하지 않습니다.</li>
-        <li>LLM 제공자(OpenAI, Anthropic 등)의 서비스 장애로 인한 손해에 대해 책임지지 않습니다.</li>
-        <li>이용자의 API 키 관리 부주의로 인한 손해에 대해 책임지지 않습니다.</li>
-      </ul>
+  <h2>제9조 (면책 조항)</h2>
+  <ul>
+    <li>AI 모델의 출력에 대해서는 정확성을 보장하지 않습니다.</li>
+    <li>LLM 제공자(OpenAI, Anthropic 등)의 서비스 장애로 인한 손해에 대해 책임지지 않습니다.</li>
+    <li>이용자의 API 키 관리 부주의로 인한 손해에 대해 책임지지 않습니다.</li>
+  </ul>
 
-      <h2>제10조 (분쟁 해결)</h2>
-      <p>서비스 이용과 관련한 분쟁은 대한민국 법률에 따라 해결합니다.</p>
+  <h2>제10조 (분쟁 해결)</h2>
+  <p>서비스 이용과 관련한 분쟁은 대한민국 법률에 따라 해결합니다.</p>
 
-      <h2>제11조 (약관의 변경)</h2>
-      <p>이 약관이 변경될 경우 시행일 7일 전 서비스 내 공지합니다. 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고 계정을 해지할 수 있습니다.</p>
+  <h2>제11조 (약관의 변경)</h2>
+  <p>이 약관이 변경될 경우 시행일 7일 전 서비스 내 공지합니다. 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고 계정을 해지할 수 있습니다.</p>
 
-      <p style="margin-top: 40px; color: #5a5f7d; font-size: 0.875rem;">
-        문의: <a href="mailto:contact@bsvibe.dev">contact@bsvibe.dev</a>
-      </p>
-    </div>
-  </body>
-</html>
+  <p style="margin-top: 40px; color: #5a5f7d; font-size: 0.875rem;">
+    문의: <a href="mailto:contact@bsvibe.dev">contact@bsvibe.dev</a>
+  </p>
+</LegalLayout>
