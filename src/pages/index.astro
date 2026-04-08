@@ -1,18 +1,43 @@
 ---
-export const prerender = false;
-import MainLayout from '@/layouts/MainLayout.astro';
-import Hero from '@/components/Hero.astro';
-import ProductsSection from '@/components/ProductsSection.astro';
-import VisionSection from '@/components/VisionSection.astro';
+import BSVibeLanding from '../components/Landing.tsx';
 ---
 
-<MainLayout
-  title="BSVibe — 만들고, 지키고, 기억한다."
-  description="따로 써도 충분하고, 같이 쓰면 놀랍습니다. BSVibe."
-  locale="ko"
-  ogUrl="https://bsvibe.dev"
->
-  <Hero locale="ko" />
-  <ProductsSection locale="ko" />
-  <VisionSection locale="ko" />
-</MainLayout>
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSVibe — 만들고, 지키고, 기억한다.</title>
+    <meta name="description" content="따로 써도 충분하고, 같이 쓰면 놀랍습니다. BSVibe." />
+
+    <!-- OG -->
+    <meta property="og:title" content="BSVibe — 만들고, 지키고, 기억한다." />
+    <meta property="og:description" content="따로 써도 충분하고, 같이 쓰면 놀랍습니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bsvibe.dev" />
+    <meta property="og:site_name" content="BSVibe" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BSVibe — 만들고, 지키고, 기억한다." />
+    <meta name="twitter:description" content="따로 써도 충분하고, 같이 쓰면 놀랍습니다." />
+
+    <link rel="icon" type="image/svg+xml" href="/images/bsvibe-symbol.svg" />
+    <link rel="apple-touch-icon" href="/images/bsvibe-logo.png" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background-color: #0a0b0f;
+        color: #e4e6ee;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <BSVibeLanding client:load />
+  </body>
+</html>
