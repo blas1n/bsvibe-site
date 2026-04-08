@@ -1,46 +1,38 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import { verifyWebhook } from '@/lib/payment.server';
+import { handleStripeWebhook, handleTossWebhook } from '@/lib/payment.server';
 
 /**
  * Payment webhook endpoint.
- * Receives events from Toss Payments and Stripe.
  *
- * TODO: After configuring payment providers:
- * 1. Register this URL as webhook endpoint:
- *    - Toss: https://bsvibe.dev/api/payment/webhook
- *    - Stripe: https://bsvibe.dev/api/payment/webhook
- * 2. Set webhook secrets in .env:
- *    - TOSS_WEBHOOK_SECRET
- *    - STRIPE_WEBHOOK_SECRET
- * 3. Implement event handlers for:
- *    - payment.confirmed / invoice.paid → activate subscription
- *    - payment.failed / invoice.payment_failed → notify user
- *    - subscription.canceled → deactivate subscription
+ * Configure in:
+ *   - Stripe Dashboard → Developers → Webhooks → Add endpoint
+ *     URL: https://bsvibe.dev/api/payment/webhook
+ *     Events: checkout.session.completed, invoice.paid, invoice.payment_failed,
+ *             customer.subscription.updated, customer.subscription.deleted
+ *   - Toss 개발자센터 → 웹훅 설정
+ *     URL: https://bsvibe.dev/api/payment/webhook
+ *     Events: PAYMENT.DONE, PAYMENT_STATUS_CHANGED
  */
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.text();
-  const signature = request.headers.get('toss-signature')
-    || request.headers.get('stripe-signature')
-    || '';
-
-  // Detect provider from headers
-  const provider = request.headers.get('stripe-signature') ? 'stripe' : 'toss';
+  const stripeSignature = request.headers.get('stripe-signature');
+  const tossSignature = request.headers.get('toss-signature');
 
   try {
-    const valid = await verifyWebhook(provider, body, signature);
-    if (!valid) {
-      return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 400 });
+    if (stripeSignature) {
+      await handleStripeWebhook(body, stripeSignature);
+    } else if (tossSignature) {
+      await handleTossWebhook(body, tossSignature);
+    } else {
+      return new Response(JSON.stringify({ error: 'Missing signature header' }), { status: 400 });
     }
-
-    // TODO: Parse event and handle accordingly
-    // const event = JSON.parse(body);
-    // switch (event.type) { ... }
 
     return new Response(JSON.stringify({ received: true }), { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Webhook processing failed';
-    return new Response(JSON.stringify({ error: message }), { status: 500 });
+    console.error('webhook error', message);
+    return new Response(JSON.stringify({ error: message }), { status: 400 });
   }
 };

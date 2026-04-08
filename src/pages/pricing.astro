@@ -1,9 +1,10 @@
 ---
+export const prerender = false;
 import MainLayout from '@/layouts/MainLayout.astro';
 import PricingTable from '@/components/PricingTable.astro';
-import { getPricing } from '@/data/pricing';
+import { getProductsWithPrices } from '@/lib/pricing.repository';
 
-const pricing = getPricing('ko');
+const products = await getProductsWithPrices('ko');
 ---
 
 <MainLayout title="가격 — BSVibe" description="BSVibe 제품별 가격 플랜" locale="ko">
@@ -13,7 +14,14 @@ const pricing = getPricing('ko');
       <p>모든 제품은 무료로 시작할 수 있습니다. 필요한 만큼만 사용하세요.</p>
     </div>
 
-    {pricing.map(p => <PricingTable pricing={p} />)}
+    {products.length === 0 ? (
+      <div class="empty-state">
+        <p>가격 정보를 불러올 수 없습니다.</p>
+        <p class="hint">관리자: Supabase 환경 변수와 마이그레이션을 확인하세요.</p>
+      </div>
+    ) : (
+      products.map(p => <PricingTable product={p} locale="ko" />)
+    )}
 
     <div class="pricing-faq">
       <h2>자주 묻는 질문</h2>
@@ -59,6 +67,16 @@ const pricing = getPricing('ko');
   .pricing-header p {
     color: #8187a8;
     font-size: 1.0625rem;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    color: #5a5f7d;
+  }
+  .empty-state .hint {
+    font-size: 0.8125rem;
+    margin-top: 8px;
+    color: #3d4160;
   }
   .pricing-faq {
     margin-top: 32px;

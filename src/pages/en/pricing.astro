@@ -1,9 +1,10 @@
 ---
+export const prerender = false;
 import MainLayout from '@/layouts/MainLayout.astro';
 import PricingTable from '@/components/PricingTable.astro';
-import { getPricing } from '@/data/pricing';
+import { getProductsWithPrices } from '@/lib/pricing.repository';
 
-const pricing = getPricing('en');
+const products = await getProductsWithPrices('en');
 ---
 
 <MainLayout title="Pricing — BSVibe" description="BSVibe product pricing plans" locale="en">
@@ -13,7 +14,14 @@ const pricing = getPricing('en');
       <p>Every product starts free. Pay only for what you use.</p>
     </div>
 
-    {pricing.map(p => <PricingTable pricing={p} />)}
+    {products.length === 0 ? (
+      <div class="empty-state">
+        <p>Pricing information unavailable.</p>
+        <p class="hint">Admin: Check Supabase env vars and migrations.</p>
+      </div>
+    ) : (
+      products.map(p => <PricingTable product={p} locale="en" />)
+    )}
 
     <div class="pricing-faq">
       <h2>Frequently Asked Questions</h2>
@@ -59,6 +67,16 @@ const pricing = getPricing('en');
   .pricing-header p {
     color: #8187a8;
     font-size: 1.0625rem;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    color: #5a5f7d;
+  }
+  .empty-state .hint {
+    font-size: 0.8125rem;
+    margin-top: 8px;
+    color: #3d4160;
   }
   .pricing-faq {
     margin-top: 32px;

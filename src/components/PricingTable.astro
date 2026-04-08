@@ -1,44 +1,55 @@
 ---
-import type { ProductPricing } from '@/data/pricing';
+import type { ProductWithPrices } from '@/lib/pricing.repository';
+import { formatPrice, formatPeriod } from '@/lib/pricing.repository';
+import type { Locale } from '@/i18n';
 
 interface Props {
-  pricing: ProductPricing;
+  product: ProductWithPrices;
+  locale: Locale;
 }
 
-const { pricing } = Astro.props;
+const { product, locale } = Astro.props;
+const ctaSignup = locale === 'en' ? 'Get Started' : '시작하기';
+const ctaContact = locale === 'en' ? 'Contact Us' : '문의하기';
 ---
 
 <div class="pricing-product">
-  <h2 class="product-name" style={`color: ${pricing.accent};`}>{pricing.product}</h2>
+  <h2 class="product-name" style={`color: ${product.accentColor};`}>{product.name}</h2>
   <div class="tiers">
-    {pricing.tiers.map(tier => (
-      <div class:list={['tier-card', { highlighted: tier.highlighted }]}
-           style={tier.highlighted ? `border-color: ${pricing.accent}40;` : ''}>
-        <div class="tier-header">
-          <h3 class="tier-name">{tier.name}</h3>
-          <div class="tier-price">
-            <span class="price">{tier.price}</span>
-            <span class="period">{tier.period}</span>
+    {product.prices.map(tier => {
+      const ctaLabel = tier.isContactOnly ? ctaContact : ctaSignup;
+      const ctaHref = tier.isContactOnly
+        ? 'mailto:contact@bsvibe.dev'
+        : `https://auth.bsvibe.dev/signup?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`;
+      return (
+        <div class:list={['tier-card', { highlighted: tier.isHighlighted }]}
+             style={tier.isHighlighted ? `border-color: ${product.accentColor}40;` : ''}>
+          <div class="tier-header">
+            <h3 class="tier-name">{tier.displayName}</h3>
+            <div class="tier-price">
+              <span class="price">{formatPrice(tier, locale)}</span>
+              <span class="period">{formatPeriod(tier, locale)}</span>
+            </div>
+            {tier.description && <p class="tier-desc">{tier.description}</p>}
           </div>
-          <p class="tier-desc">{tier.description}</p>
+          <ul class="tier-features">
+            {tier.features.map(f => (
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={product.accentColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3.5 8l3 3 6-6"/>
+                </svg>
+                {f}
+              </li>
+            ))}
+          </ul>
+          <a href={ctaHref}
+             class:list={['tier-cta', { primary: tier.isHighlighted }]}
+             style={tier.isHighlighted ? `background-color: ${product.accentColor}; color: #fff;` : ''}>
+            {ctaLabel}
+          </a>
         </div>
-        <ul class="tier-features">
-          {tier.features.map(f => (
-            <li>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={pricing.accent} stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3.5 8l3 3 6-6"/>
-              </svg>
-              {f}
-            </li>
-          ))}
-        </ul>
-        <a href={tier.price === '문의' || tier.price === 'Contact' ? 'mailto:contact@bsvibe.dev' : `https://auth.bsvibe.dev/signup?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`}
-           class:list={['tier-cta', { primary: tier.highlighted }]}
-           style={tier.highlighted ? `background-color: ${pricing.accent}; color: #fff;` : ''}>
-          {tier.cta}
-        </a>
-      </div>
-    ))}
+      );
+    })}
   </div>
 </div>
 
