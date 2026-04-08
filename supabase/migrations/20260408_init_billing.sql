@@ -10,6 +10,11 @@ create table if not exists public.products (
   description text,
   accent_color text,               -- '#f59e0b'
   app_url text,
+  tagline_ko text,
+  tagline_en text,
+  detail_ko text,
+  detail_en text,
+  icon_svg text,                   -- inline SVG markup for the product card
   display_order int default 0,
   is_active boolean default true,
   created_at timestamptz default now(),
@@ -133,11 +138,31 @@ create policy "Users can read own payment history" on public.payment_history
   for select using (auth.uid() = user_id);
 
 -- ========== seed data ==========
-insert into public.products (id, name, accent_color, app_url, display_order) values
-  ('bsgateway', 'BSGateway', '#f59e0b', 'https://gateway.bsvibe.dev', 1),
-  ('bsnexus', 'BSNexus', '#3b82f6', 'https://nexus.bsvibe.dev', 2),
-  ('bsupervisor', 'BSupervisor', '#f43f5e', 'https://supervisor.bsvibe.dev', 3),
-  ('bsage', 'BSage', '#10b981', 'https://sage.bsvibe.dev', 4)
+insert into public.products (id, name, accent_color, app_url, tagline_ko, tagline_en, detail_ko, detail_en, icon_svg, display_order) values
+  ('bsgateway', 'BSGateway', '#f59e0b', 'https://gateway.bsvibe.dev',
+   '어떤 모델이 좋을지, 고민하지 않아도 됩니다.',
+   'Stop choosing models. The right one is picked for you.',
+   '스마트 라우팅', 'Smart Routing',
+   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l3-9 3 18 3-9h4"/></svg>',
+   1),
+  ('bsnexus', 'BSNexus', '#3b82f6', 'https://nexus.bsvibe.dev',
+   '아이디어만 던지면, 알아서 만들어집니다.',
+   'Throw an idea in, and it builds itself.',
+   '프로젝트 매니저', 'Project Manager',
+   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4M10 17.5h4M6.5 10v4M17.5 10v4"/></svg>',
+   2),
+  ('bsupervisor', 'BSupervisor', '#f43f5e', 'https://supervisor.bsvibe.dev',
+   '잠든 사이에도, 묵묵히 지켜보고 있습니다.',
+   'Watching quietly, even while you sleep.',
+   '안전 모니터링', 'Safety Monitoring',
+   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+   3),
+  ('bsage', 'BSage', '#10b981', 'https://sage.bsvibe.dev',
+   '정리하지 않아도, 기억하고 연결해 줍니다.',
+   'Remembers and connects — no organizing needed.',
+   '당신보다 당신을 잘 아는 비서', 'The assistant that knows you better than you',
+   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 2 20 2s-1.7 5.3-4 9.5C14 15 11 20 11 20z"/><path d="M6.7 17.3s2.1-3.1 5.3-7.3"/></svg>',
+   4)
 on conflict (id) do nothing;
 
 -- Free tier (always available)

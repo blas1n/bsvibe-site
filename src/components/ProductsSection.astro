@@ -1,7 +1,7 @@
 ---
 import type { Locale } from '@/i18n';
 import { getTranslations } from '@/i18n';
-import { productsMeta } from '@/data/products';
+import { getProducts } from '@/lib/pricing.repository';
 import ProductCard from './ProductCard.astro';
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const l = getTranslations(locale);
+const products = await getProducts(locale);
 ---
 
 <section id="products" class="products-section">
@@ -18,14 +19,8 @@ const l = getTranslations(locale);
   </div>
 
   <div class="products-grid">
-    {productsMeta.map((p, i) => (
-      <ProductCard
-        product={p}
-        detail={l.products[p.name].detail}
-        desc={l.products[p.name].desc}
-        index={i}
-        locale={locale}
-      />
+    {products.map((p, i) => (
+      <ProductCard product={p} index={i} locale={locale} />
     ))}
   </div>
 

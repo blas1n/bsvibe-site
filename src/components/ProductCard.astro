@@ -1,45 +1,28 @@
 ---
-import type { ProductMeta } from '@/data/products';
+import type { Product } from '@/lib/pricing.repository';
 
 interface Props {
-  product: ProductMeta;
-  detail: string;
-  desc: string;
+  product: Product;
   index: number;
   locale?: 'ko' | 'en';
 }
 
-const { product, detail, desc, index, locale = 'ko' } = Astro.props;
-const p = product;
+const { product, index, locale = 'ko' } = Astro.props;
 const prefix = locale === 'en' ? '/en' : '';
 ---
 
-<a href={`${prefix}/products/${p.slug}`} class="product-card fade-up" style={`animation-delay: ${0.8 + index * 0.12}s;`}>
-  <div class="card-glow" style={`background: radial-gradient(circle, ${p.accentGlow}, transparent 70%);`} />
+<a href={`${prefix}/products/${product.id}`} class="product-card fade-up" style={`animation-delay: ${0.8 + index * 0.12}s;`}>
+  <div class="card-glow" style={`background: radial-gradient(circle, ${product.accentColor}26, transparent 70%);`} />
   <div class="card-inner">
     <div class="card-header">
-      <div class="card-icon" style={`background-color: ${p.accent}12; border-color: ${p.accent}22; color: ${p.accent};`}>
-        {p.name === 'BSNexus' ? (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-            <path d="M10 6.5h4M10 17.5h4M6.5 10v4M17.5 10v4"/>
-          </svg>
-        ) : p.name === 'BSage' ? (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 2 20 2s-1.7 5.3-4 9.5C14 15 11 20 11 20z"/>
-            <path d="M6.7 17.3s2.1-3.1 5.3-7.3"/>
-          </svg>
-        ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d={p.iconPath}/>
-          </svg>
-        )}
+      <div class="card-icon" style={`background-color: ${product.accentColor}12; border-color: ${product.accentColor}22; color: ${product.accentColor};`}>
+        <Fragment set:html={product.iconSvg} />
       </div>
     </div>
 
-    <h3 class="card-name">{p.name}</h3>
-    <div class="card-detail" style={`color: ${p.accent};`}>{detail}</div>
-    <p class="card-desc">{desc}</p>
+    <h3 class="card-name">{product.name}</h3>
+    <div class="card-detail" style={`color: ${product.accentColor};`}>{product.detail}</div>
+    <p class="card-desc">{product.tagline}</p>
   </div>
 </a>
 

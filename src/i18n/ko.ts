@@ -14,10 +14,4 @@ export const ko: Translations = {
   productsHeading: '서로 다른 제품. 하나의 경험.',
   vision: '하나의 계정, 하나의 경험. 경계 없이, 자연스럽게.',
   footer: { docs: '문서', privacy: '개인정보처리방침', terms: '이용약관' },
-  products: {
-    BSGateway: { desc: '어떤 모델이 좋을지, 고민하지 않아도 됩니다.', detail: '스마트 라우팅' },
-    BSNexus: { desc: '아이디어만 던지면, 알아서 만들어집니다.', detail: '프로젝트 매니저' },
-    BSupervisor: { desc: '잠든 사이에도, 묵묵히 지켜보고 있습니다.', detail: '안전 모니터링' },
-    BSage: { desc: '정리하지 않아도, 기억하고 연결해 줍니다.', detail: '당신보다 당신을 잘 아는 비서' },
-  },
 };

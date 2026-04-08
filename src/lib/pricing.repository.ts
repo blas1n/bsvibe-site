@@ -7,6 +7,9 @@ export interface Product {
   description: string | null;
   accentColor: string;
   appUrl: string;
+  tagline: string;
+  detail: string;
+  iconSvg: string;
   displayOrder: number;
 }
 
@@ -37,6 +40,11 @@ interface ProductRow {
   description: string | null;
   accent_color: string;
   app_url: string;
+  tagline_ko: string | null;
+  tagline_en: string | null;
+  detail_ko: string | null;
+  detail_en: string | null;
+  icon_svg: string | null;
   display_order: number;
 }
 
@@ -58,13 +66,16 @@ interface PriceRow {
   display_order: number;
 }
 
-function toProduct(row: ProductRow): Product {
+function toProduct(row: ProductRow, locale: Locale): Product {
   return {
     id: row.id,
     name: row.name,
     description: row.description,
     accentColor: row.accent_color,
     appUrl: row.app_url,
+    tagline: (locale === 'en' ? row.tagline_en : row.tagline_ko) ?? '',
+    detail: (locale === 'en' ? row.detail_en : row.detail_ko) ?? '',
+    iconSvg: row.icon_svg ?? '',
     displayOrder: row.display_order,
   };
 }
@@ -117,13 +128,37 @@ export async function getProductsWithPrices(locale: Locale): Promise<ProductWith
     return [];
   }
 
-  const products = (productsRes.data as ProductRow[]).map(toProduct);
+  const products = (productsRes.data as ProductRow[]).map(row => toProduct(row, locale));
   const prices = (pricesRes.data as PriceRow[]).map(row => toPrice(row, locale));
 
   return products.map(product => ({
     ...product,
     prices: prices.filter(p => p.productId === product.id),
   }));
+}
+
+/**
+ * Fetch active products without prices (for landing page product cards).
+ * Returns empty array if Supabase not configured.
+ */
+export async function getProducts(locale: Locale): Promise<Product[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = getSupabaseAnon();
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order');
+
+  if (error) {
+    console.error('Failed to fetch products', error);
+    return [];
+  }
+
+  return (data as ProductRow[]).map(row => toProduct(row, locale));
 }
 
 /**

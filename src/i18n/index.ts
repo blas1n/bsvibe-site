@@ -27,12 +27,6 @@ export interface Translations {
     privacy: string;
     terms: string;
   };
-  products: {
-    BSGateway: { desc: string; detail: string };
-    BSNexus: { desc: string; detail: string };
-    BSupervisor: { desc: string; detail: string };
-    BSage: { desc: string; detail: string };
-  };
 }
 
 import { ko } from './ko';
