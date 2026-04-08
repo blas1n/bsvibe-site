@@ -1,37 +1,97 @@
 ---
 export const prerender = false;
 import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import { listApiKeys, isBSGatewayConfigured } from '@/lib/bsgateway.server';
+
+const user = Astro.locals.user!;
+const configured = isBSGatewayConfigured();
+const apiKeys = (configured && user.tenantId) ? await listApiKeys(user.tenantId) : null;
+
+function formatDate(iso: string | null): string {
+  if (!iso) return '—';
+  return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+}
 ---
 
 <DashboardLayout title="API Keys — BSVibe" locale="en">
-  <h1 class="page-title">API Keys</h1>
-  <p class="page-desc">Create, delete, and regenerate API keys.</p>
-  <div class="coming-soon">
-    <p>Coming soon.</p>
+  <div class="header-row">
+    <div>
+      <h1 class="page-title">API Keys</h1>
+      <p class="page-desc">Create and manage API keys to access BSGateway.</p>
+    </div>
+    {configured && user.tenantId && <button class="create-btn" data-create-key>+ New API Key</button>}
   </div>
+
+  {!configured ? (
+    <div class="empty"><p>BSGateway is not connected.</p><p class="hint">Admin: configure <code>BSGATEWAY_API_KEY</code>.</p></div>
+  ) : !user.tenantId ? (
+    <div class="empty"><p>No tenant assigned.</p></div>
+  ) : !apiKeys ? (
+    <div class="empty"><p>Could not load API keys.</p></div>
+  ) : apiKeys.length === 0 ? (
+    <div class="empty"><p>No API keys yet.</p><p class="hint">Click "+ New API Key" above to create one.</p></div>
+  ) : (
+    <table class="key-table">
+      <thead><tr><th>Name</th><th>Key</th><th>Scopes</th><th>Last Used</th><th>Created</th><th></th></tr></thead>
+      <tbody>
+        {apiKeys.map(key => (
+          <tr class:list={[{ inactive: !key.is_active }]}>
+            <td>{key.name}</td>
+            <td><code>{key.key_prefix}...</code></td>
+            <td><div class="scopes">{key.scopes.map(s => <span class="scope-badge">{s}</span>)}</div></td>
+            <td>{formatDate(key.last_used_at)}</td>
+            <td>{formatDate(key.created_at)}</td>
+            <td>{key.is_active && <button class="revoke-btn" data-revoke-id={key.id}>Revoke</button>}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
 </DashboardLayout>
 
+<script>
+  document.querySelector('[data-create-key]')?.addEventListener('click', async () => {
+    const name = prompt('API key name:');
+    if (!name) return;
+    const res = await fetch('/api/account/api-keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      alert(`Key created. This will not be shown again — save it now:\n\n${data.key}`);
+      window.location.reload();
+    } else alert('Creation failed');
+  });
+  document.querySelectorAll('[data-revoke-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const id = (e.currentTarget as HTMLElement).dataset.revokeId;
+      if (!id || !confirm('Revoke this API key?')) return;
+      const res = await fetch(`/api/account/api-keys?id=${id}`, { method: 'DELETE' });
+      if (res.ok) window.location.reload(); else alert('Revoke failed');
+    });
+  });
+</script>
+
 <style>
-  .page-title {
-    color: #f2f3f7;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
-  }
-  .page-desc {
-    color: #8187a8;
-    font-size: 0.9375rem;
-    margin-bottom: 32px;
-  }
-  .coming-soon {
-    padding: 48px;
-    border-radius: 12px;
-    border: 1px dashed #2a2d42;
-    text-align: center;
-  }
-  .coming-soon p {
-    color: #5a5f7d;
-    font-size: 0.9375rem;
-  }
+  .header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 32px; }
+  .page-title { color: #f2f3f7; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .page-desc { color: #8187a8; font-size: 0.9375rem; }
+  .create-btn { padding: 10px 20px; border-radius: 8px; background-color: #6366f1; color: #fff; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; transition: opacity 0.15s ease; }
+  .create-btn:hover { opacity: 0.9; }
+  .empty { padding: 48px; border-radius: 12px; border: 1px dashed #2a2d42; text-align: center; color: #5a5f7d; }
+  .empty .hint { margin-top: 8px; font-size: 0.8125rem; color: #3d4160; }
+  .empty code { font-family: 'JetBrains Mono', monospace; background-color: rgba(99,102,241,0.08); padding: 1px 6px; border-radius: 4px; color: #818cf8; }
+  .key-table { width: 100%; border-collapse: collapse; border: 1px solid #2a2d42; border-radius: 12px; overflow: hidden; }
+  .key-table th, .key-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #1e2033; font-size: 0.875rem; }
+  .key-table th { background-color: #111218; color: #5a5f7d; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .key-table td { color: #a8adc6; }
+  .key-table tbody tr.inactive { opacity: 0.5; }
+  .key-table code { font-family: 'JetBrains Mono', monospace; color: #818cf8; font-size: 0.8125rem; }
+  .key-table tbody tr:last-child td { border-bottom: none; }
+  .scopes { display: flex; flex-wrap: wrap; gap: 4px; }
+  .scope-badge { font-size: 0.6875rem; padding: 2px 8px; border-radius: 9999px; background-color: rgba(99,102,241,0.08); color: #818cf8; border: 1px solid rgba(99,102,241,0.15); }
+  .revoke-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid #2a2d42; background: none; color: #8187a8; font-size: 0.75rem; cursor: pointer; transition: all 0.15s ease; }
+  .revoke-btn:hover { border-color: #fb7185; color: #fb7185; }
 </style>

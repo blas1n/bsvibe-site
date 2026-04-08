@@ -1,0 +1,161 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+---
+
+<MainLayout title="소개 — BSVibe" description="BSVibe의 비전, 미션, 그리고 함께하는 사람들" locale="ko">
+  <div class="about-page">
+    <header class="about-hero">
+      <h1>만들고, 지키고, 기억한다.</h1>
+      <p class="lead">BSVibe는 네 개의 독립적인 AI 소프트웨어가 하나의 경험으로 연결되는 생태계입니다.</p>
+    </header>
+
+    <section class="about-section">
+      <h2>비전</h2>
+      <p>
+        Apple은 하드웨어를 만들었습니다. 각각의 기기는 독립적으로 훌륭하지만, 함께 사용하면 경험이 달라집니다.
+        AirDrop, Handoff, iCloud — 경계가 사라지고 자연스러운 흐름만 남습니다.
+      </p>
+      <p>BSVibe는 그 철학을 소프트웨어에 적용합니다.</p>
+    </section>
+
+    <section class="about-section">
+      <h2>미션</h2>
+      <p>
+        AI 도구가 폭발적으로 늘어나는 시대, 사용자는 점점 더 많은 선택을 강요받고 있습니다.
+        어떤 모델이 좋은지, 어떤 에이전트가 안전한지, 어떤 지식이 필요한지 — 매번 고민하고 결정해야 합니다.
+      </p>
+      <p>
+        BSVibe는 이런 결정을 줄여줍니다. 기술의 복잡함은 우리가 처리하고, 사용자에게는 결과만 남깁니다.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>제품</h2>
+      <ul class="product-list">
+        <li><a href="/products/bsgateway"><strong>BSGateway</strong> — 스마트 LLM 라우팅</a></li>
+        <li><a href="/products/bsnexus"><strong>BSNexus</strong> — AI 에이전트 오케스트레이션</a></li>
+        <li><a href="/products/bsupervisor"><strong>BSupervisor</strong> — AI 감사 및 안전 관리</a></li>
+        <li><a href="/products/bsage"><strong>BSage</strong> — 온톨로지 기반 지식 관리</a></li>
+      </ul>
+    </section>
+
+    <section class="about-section">
+      <h2>가치</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <h3>독립성</h3>
+          <p>각 제품은 따로 써도 충분한 가치를 제공합니다. 하나에 묶이지 않는 자유.</p>
+        </div>
+        <div class="value-card">
+          <h3>연결성</h3>
+          <p>같이 쓰면 곱셈처럼 가치가 커집니다. 하나의 계정, 하나의 경험.</p>
+        </div>
+        <div class="value-card">
+          <h3>안전성</h3>
+          <p>AI의 모든 행동은 추적 가능하고 통제 가능합니다. 잠든 사이에도 안심.</p>
+        </div>
+        <div class="value-card">
+          <h3>투명성</h3>
+          <p>가격, 데이터, 의사결정. 숨길 것이 없습니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>연락하기</h2>
+      <p>
+        BSVibe에 대해 궁금한 점이나 협력 제안이 있다면 <a href="/contact">문의 페이지</a>를 통해 연락 주세요.
+      </p>
+    </section>
+  </div>
+</MainLayout>
+
+<style>
+  .about-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 24px 120px;
+  }
+  .about-hero {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .about-hero h1 {
+    color: #f2f3f7;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-bottom: 16px;
+  }
+  .about-hero .lead {
+    font-size: 1.125rem;
+    color: #8187a8;
+    line-height: 1.7;
+  }
+  .about-section {
+    margin-bottom: 56px;
+  }
+  .about-section h2 {
+    color: #f2f3f7;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .about-section p {
+    color: #a8adc6;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .about-section a {
+    color: #818cf8;
+    text-decoration: none;
+  }
+  .about-section a:hover {
+    text-decoration: underline;
+  }
+  .product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .product-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid #1e2033;
+  }
+  .product-list li:last-child {
+    border-bottom: none;
+  }
+  .product-list a {
+    color: #a8adc6;
+    font-size: 1rem;
+  }
+  .product-list strong {
+    color: #f2f3f7;
+    margin-right: 8px;
+  }
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .value-card {
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+  }
+  .value-card h3 {
+    color: #f2f3f7;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .value-card p {
+    color: #8187a8;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>

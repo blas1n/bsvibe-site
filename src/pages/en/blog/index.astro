@@ -8,8 +8,16 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.loc
 
 <MainLayout title="Blog — BSVibe" description="Stories about BSVibe's technology, products, and AI" locale="en">
   <div class="blog-listing">
-    <h1>Blog</h1>
-    <p class="blog-subtitle">Stories about technology, products, and AI.</p>
+    <div class="blog-header-row">
+      <div>
+        <h1>Blog</h1>
+        <p class="blog-subtitle">Stories about technology, products, and AI.</p>
+      </div>
+      <a href="/en/blog/rss.xml" class="rss-link" title="RSS Feed">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83C19.56 11.33 12.67 4.44 4 4.44z"/><path d="M4 10.1v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+        RSS
+      </a>
+    </div>
 
     <div class="posts">
       {posts.length === 0 ? (
@@ -21,7 +29,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.loc
               <time>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(post.data.date)}</time>
               {post.data.tags.length > 0 && (
                 <div class="post-tags">
-                  {post.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                  {post.data.tags.map(tag => <a href={`/en/blog/tags/${tag}`} class="tag">{tag}</a>)}
                 </div>
               )}
             </div>
@@ -39,6 +47,31 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.loc
     max-width: 720px;
     margin: 0 auto;
     padding: 16px 24px 120px;
+  }
+  .blog-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .rss-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5a5f7d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #2a2d42;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .rss-link:hover {
+    color: #f59e0b;
+    border-color: rgba(245,158,11,0.3);
   }
   h1 {
     color: #f2f3f7;

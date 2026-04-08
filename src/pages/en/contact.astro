@@ -1,0 +1,71 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+---
+
+<MainLayout title="Contact — BSVibe" description="Get in touch with BSVibe team" locale="en">
+  <div class="contact-page">
+    <header class="contact-hero">
+      <h1>Get in Touch</h1>
+      <p class="lead">We welcome inquiries about our products, partnerships, and opportunities.</p>
+    </header>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="card-icon">📧</div>
+        <h2>Email</h2>
+        <p>For the fastest response, reach us by email.</p>
+        <a href="mailto:contact@bsvibe.dev" class="contact-link">contact@bsvibe.dev</a>
+      </div>
+
+      <div class="contact-card">
+        <div class="card-icon">💼</div>
+        <h2>Business</h2>
+        <p>Enterprise plans, partnerships, and consulting.</p>
+        <a href="mailto:contact@bsvibe.dev?subject=Business Inquiry" class="contact-link">Send business inquiry →</a>
+      </div>
+
+      <div class="contact-card">
+        <div class="card-icon">🐛</div>
+        <h2>Bug Report</h2>
+        <p>Let us know what's broken — we'll fix it fast.</p>
+        <a href="mailto:contact@bsvibe.dev?subject=Bug Report" class="contact-link">Report a bug →</a>
+      </div>
+
+      <div class="contact-card">
+        <div class="card-icon">💡</div>
+        <h2>Feedback</h2>
+        <p>Share your thoughts and suggestions about our products.</p>
+        <a href="mailto:contact@bsvibe.dev?subject=Feedback" class="contact-link">Send feedback →</a>
+      </div>
+    </div>
+
+    <div class="contact-info">
+      <h2>Other Channels</h2>
+      <ul>
+        <li><strong>GitHub</strong>: <a href="https://github.com/BSVibe" target="_blank" rel="noopener noreferrer">github.com/BSVibe</a></li>
+        <li><strong>Response time</strong>: Within 24 hours on weekdays</li>
+      </ul>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .contact-page { max-width: 800px; margin: 0 auto; padding: 16px 24px 120px; }
+  .contact-hero { text-align: center; margin-bottom: 64px; }
+  .contact-hero h1 { color: #f2f3f7; font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 800; letter-spacing: -0.035em; margin-bottom: 16px; }
+  .contact-hero .lead { font-size: 1.125rem; color: #8187a8; }
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 64px; }
+  .contact-card { padding: 28px; border-radius: 14px; border: 1px solid #2a2d42; background-color: #111218; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .contact-card h2 { color: #f2f3f7; font-size: 1.125rem; font-weight: 600; margin-bottom: 8px; }
+  .contact-card p { color: #8187a8; font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px; }
+  .contact-link { color: #818cf8; font-size: 0.875rem; font-weight: 500; text-decoration: none; }
+  .contact-link:hover { color: #a5b4fc; }
+  .contact-info { padding: 32px; border-radius: 12px; border: 1px solid #1e2033; background-color: rgba(99,102,241,0.04); }
+  .contact-info h2 { color: #f2f3f7; font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+  .contact-info ul { list-style: none; padding: 0; margin: 0; }
+  .contact-info li { color: #a8adc6; font-size: 0.875rem; margin-bottom: 8px; }
+  .contact-info strong { color: #e4e6ee; margin-right: 8px; }
+  .contact-info a { color: #818cf8; text-decoration: none; }
+  .contact-info a:hover { text-decoration: underline; }
+</style>

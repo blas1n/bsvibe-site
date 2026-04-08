@@ -1,15 +1,196 @@
 ---
 export const prerender = false;
 import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import { getActiveSubscription, getPaymentHistory } from '@/lib/subscription.repository';
+import { getProductsWithPrices } from '@/lib/pricing.repository';
+
+const user = Astro.locals.user!;
+const success = Astro.url.searchParams.get('success');
+const canceled = Astro.url.searchParams.get('canceled');
+
+let subscription = null;
+let payments: Awaited<ReturnType<typeof getPaymentHistory>> = [];
+let plans: Awaited<ReturnType<typeof getProductsWithPrices>> = [];
+let loadError: string | null = null;
+
+try {
+  [subscription, payments, plans] = await Promise.all([
+    getActiveSubscription(user.id),
+    getPaymentHistory(user.id, 10),
+    getProductsWithPrices('ko'),
+  ]);
+} catch (err) {
+  loadError = err instanceof Error ? err.message : 'Failed to load billing data';
+}
+
+const activePlan = subscription
+  ? plans
+      .flatMap(p => p.prices.map(price => ({ price, product: p })))
+      .find(item => item.price.id === subscription!.priceId)
+  : null;
+
+function formatDate(d: Date | null): string {
+  if (!d) return '—';
+  return new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
+}
+
+function formatAmount(amount: number, currency: string): string {
+  if (currency === 'KRW') return `₩${amount.toLocaleString('ko-KR')}`;
+  return `$${(amount / 100).toFixed(2)}`;
+}
+
+const statusLabels: Record<string, string> = {
+  active: '활성',
+  trialing: '체험 중',
+  canceled: '취소됨',
+  past_due: '결제 지연',
+  incomplete: '미완료',
+};
+
+const paymentStatusLabels: Record<string, string> = {
+  succeeded: '성공',
+  failed: '실패',
+  pending: '대기',
+  refunded: '환불',
+};
 ---
 
 <DashboardLayout title="결제 관리 — BSVibe" locale="ko">
   <h1 class="page-title">결제 관리</h1>
-  <p class="page-desc">구독, 결제 수단, 결제 내역을 관리합니다.</p>
-  <div class="coming-soon">
-    <p>준비 중입니다.</p>
-  </div>
+  <p class="page-desc">구독, 결제 내역, 플랜 변경을 관리합니다.</p>
+
+  {success && (
+    <div class="alert success">
+      <strong>결제가 완료되었습니다.</strong> 구독 상태는 잠시 후 업데이트됩니다.
+    </div>
+  )}
+  {canceled && (
+    <div class="alert info">결제가 취소되었습니다.</div>
+  )}
+  {loadError && (
+    <div class="alert error">결제 정보를 불러올 수 없습니다: {loadError}</div>
+  )}
+
+  {/* Current subscription */}
+  <section class="section">
+    <h2>현재 구독</h2>
+    {subscription && activePlan ? (
+      <div class="sub-card">
+        <div class="sub-header">
+          <div>
+            <h3>{activePlan.product.name} {activePlan.price.displayName}</h3>
+            <p class="sub-status">
+              <span class:list={['status-badge', subscription.status]}>{statusLabels[subscription.status] ?? subscription.status}</span>
+              {subscription.cancelAtPeriodEnd && (
+                <span class="status-note">기간 만료 시 취소 예정</span>
+              )}
+            </p>
+          </div>
+          {!subscription.cancelAtPeriodEnd && (
+            <button class="cancel-btn" data-cancel-sub>구독 취소</button>
+          )}
+        </div>
+        <dl class="sub-details">
+          <div>
+            <dt>다음 결제일</dt>
+            <dd>{formatDate(subscription.currentPeriodEnd)}</dd>
+          </div>
+          <div>
+            <dt>결제 수단</dt>
+            <dd>{subscription.provider === 'stripe' ? 'Stripe' : '토스페이먼츠'}</dd>
+          </div>
+        </dl>
+      </div>
+    ) : (
+      <div class="no-sub">
+        <p>현재 활성 구독이 없습니다.</p>
+        <a href="/pricing" class="upgrade-btn">플랜 보기</a>
+      </div>
+    )}
+  </section>
+
+  {/* Available plans (only show if no active sub) */}
+  {!subscription && plans.length > 0 && (
+    <section class="section">
+      <h2>플랜 선택</h2>
+      <div class="plan-grid">
+        {plans.flatMap(product =>
+          product.prices
+            .filter(p => !p.isContactOnly && p.tier !== 'free')
+            .map(price => (
+              <button class="plan-option" data-price-id={price.id} style={`border-color: ${product.accentColor}40;`}>
+                <div class="plan-name" style={`color: ${product.accentColor};`}>{product.name}</div>
+                <div class="plan-tier">{price.displayName}</div>
+              </button>
+            ))
+        )}
+      </div>
+    </section>
+  )}
+
+  {/* Payment history */}
+  <section class="section">
+    <h2>결제 내역</h2>
+    {payments.length === 0 ? (
+      <div class="empty">결제 내역이 없습니다.</div>
+    ) : (
+      <table class="payment-table">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>설명</th>
+            <th>금액</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {payments.map(p => (
+            <tr>
+              <td>{formatDate(p.paidAt ?? p.createdAt)}</td>
+              <td>{p.description ?? '—'}</td>
+              <td>{formatAmount(p.amount, p.currency)}</td>
+              <td><span class:list={['payment-status', p.status]}>{paymentStatusLabels[p.status] ?? p.status}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </section>
 </DashboardLayout>
+
+<script>
+  document.querySelector('[data-cancel-sub]')?.addEventListener('click', async () => {
+    if (!confirm('정말 구독을 취소하시겠습니까? 현재 결제 기간 종료까지 서비스를 이용할 수 있습니다.')) return;
+    const res = await fetch('/api/payment/subscription', { method: 'DELETE' });
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      alert(`취소 실패: ${err.error ?? res.statusText}`);
+    }
+  });
+
+  document.querySelectorAll('[data-price-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const priceId = (e.currentTarget as HTMLElement).dataset.priceId;
+      if (!priceId) return;
+
+      const res = await fetch('/api/payment/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId, locale: 'ko' }),
+      });
+
+      if (res.ok) {
+        const { url } = await res.json();
+        window.location.href = url;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(`결제 시작 실패: ${err.error ?? res.statusText}`);
+      }
+    });
+  });
+</script>
 
 <style>
   .page-title {
@@ -24,14 +205,215 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro';
     font-size: 0.9375rem;
     margin-bottom: 32px;
   }
-  .coming-soon {
-    padding: 48px;
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 0.875rem;
+  }
+  .alert.success {
+    background-color: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.2);
+    color: #34d399;
+  }
+  .alert.info {
+    background-color: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: #818cf8;
+  }
+  .alert.error {
+    background-color: rgba(244,63,94,0.08);
+    border: 1px solid rgba(244,63,94,0.2);
+    color: #fb7185;
+  }
+  .section {
+    margin-bottom: 40px;
+  }
+  .section h2 {
+    color: #f2f3f7;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .sub-card {
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+  }
+  .sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .sub-header h3 {
+    color: #f2f3f7;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+  .sub-status {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-badge {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .status-badge.active, .status-badge.trialing {
+    background-color: rgba(16,185,129,0.1);
+    color: #34d399;
+  }
+  .status-badge.canceled {
+    background-color: rgba(120,120,140,0.1);
+    color: #8187a8;
+  }
+  .status-badge.past_due, .status-badge.incomplete {
+    background-color: rgba(244,63,94,0.1);
+    color: #fb7185;
+  }
+  .status-note {
+    font-size: 0.75rem;
+    color: #8187a8;
+  }
+  .cancel-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #2a2d42;
+    background: none;
+    color: #8187a8;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cancel-btn:hover {
+    border-color: #fb7185;
+    color: #fb7185;
+  }
+  .sub-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding-top: 20px;
+    border-top: 1px solid #1e2033;
+  }
+  .sub-details > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sub-details dt {
+    font-size: 0.75rem;
+    color: #5a5f7d;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .sub-details dd {
+    color: #e4e6ee;
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+  .no-sub {
+    padding: 32px;
     border-radius: 12px;
     border: 1px dashed #2a2d42;
     text-align: center;
   }
-  .coming-soon p {
-    color: #5a5f7d;
-    font-size: 0.9375rem;
+  .no-sub p {
+    color: #8187a8;
+    margin-bottom: 16px;
   }
+  .upgrade-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #6366f1;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .upgrade-btn:hover {
+    opacity: 0.9;
+  }
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .plan-option {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #2a2d42;
+    background-color: #111218;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+  }
+  .plan-option:hover {
+    transform: translateY(-2px);
+  }
+  .plan-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .plan-tier {
+    color: #8187a8;
+    font-size: 0.75rem;
+  }
+  .empty {
+    padding: 32px;
+    border-radius: 12px;
+    border: 1px dashed #2a2d42;
+    text-align: center;
+    color: #5a5f7d;
+    font-size: 0.875rem;
+  }
+  .payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #2a2d42;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .payment-table th, .payment-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #1e2033;
+    font-size: 0.875rem;
+  }
+  .payment-table th {
+    background-color: #111218;
+    color: #5a5f7d;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .payment-table td {
+    color: #a8adc6;
+  }
+  .payment-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .payment-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .payment-status.succeeded { color: #34d399; }
+  .payment-status.failed { color: #fb7185; }
+  .payment-status.pending { color: #f59e0b; }
+  .payment-status.refunded { color: #8187a8; }
 </style>

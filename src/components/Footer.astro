@@ -18,11 +18,12 @@ const prefix = getLocalePrefix(locale);
     <span class="footer-copy">&copy; 2026</span>
   </div>
   <div class="footer-links">
+    <a href={`${prefix}/about`} class="nav-link">{locale === 'en' ? 'About' : '소개'}</a>
     <a href={`${prefix}/bsgateway/getting-started`} class="nav-link">{l.footer.docs}</a>
+    <a href={`${prefix}/contact`} class="nav-link">{locale === 'en' ? 'Contact' : '문의'}</a>
     <a href={`${prefix}/privacy`} class="nav-link">{l.footer.privacy}</a>
     <a href={`${prefix}/terms`} class="nav-link">{l.footer.terms}</a>
     <a href="https://github.com/BSVibe" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
-    <a href="mailto:contact@bsvibe.dev" class="nav-link">contact@bsvibe.dev</a>
   </div>
 </footer>
 

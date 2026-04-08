@@ -1,0 +1,54 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.locale === 'ko');
+  const tags = [...new Set(posts.flatMap(p => p.data.tags))];
+  return tags.map(tag => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts.filter(p => p.data.tags.includes(tag))
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<MainLayout title={`#${tag} — BSVibe 블로그`} description={`${tag} 태그가 포함된 포스트`} locale="ko">
+  <div class="tag-page">
+    <a href="/blog" class="back-link">← 블로그로 돌아가기</a>
+    <h1><span class="tag-hash">#</span>{tag}</h1>
+    <p class="count">{posts.length}개의 포스트</p>
+
+    <div class="posts">
+      {posts.map((post: any) => (
+        <a href={`/blog/${post.id}`} class="post-card">
+          <div class="post-meta">
+            <time>{new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(post.data.date)}</time>
+          </div>
+          <h2>{post.data.title}</h2>
+          <p>{post.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .tag-page { max-width: 720px; margin: 0 auto; padding: 16px 24px 120px; }
+  .back-link { display: inline-block; margin-bottom: 32px; color: #8187a8; font-size: 0.875rem; text-decoration: none; }
+  .back-link:hover { color: #f2f3f7; }
+  h1 { color: #f2f3f7; font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; }
+  .tag-hash { color: #6366f1; }
+  .count { color: #5a5f7d; font-size: 0.875rem; margin-bottom: 32px; }
+  .posts { display: flex; flex-direction: column; gap: 16px; }
+  .post-card { display: block; padding: 24px; border-radius: 12px; border: 1px solid #2a2d42; background-color: #111218; text-decoration: none; transition: all 0.2s ease; }
+  .post-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-2px); }
+  .post-meta time { color: #5a5f7d; font-size: 0.8125rem; }
+  .post-card h2 { color: #f2f3f7; font-size: 1.25rem; font-weight: 600; margin: 8px 0 6px; letter-spacing: -0.02em; }
+  .post-card p { color: #8187a8; font-size: 0.9375rem; margin: 0; line-height: 1.5; }
+</style>

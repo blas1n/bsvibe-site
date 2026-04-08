@@ -1,0 +1,90 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+---
+
+<MainLayout title="About — BSVibe" description="BSVibe's vision, mission, and values" locale="en">
+  <div class="about-page">
+    <header class="about-hero">
+      <h1>Build. Guard. Remember.</h1>
+      <p class="lead">BSVibe is an ecosystem where four independent AI products connect into a single experience.</p>
+    </header>
+
+    <section class="about-section">
+      <h2>Vision</h2>
+      <p>
+        Apple built hardware. Each device is excellent on its own, but the experience changes when used together.
+        AirDrop, Handoff, iCloud — boundaries disappear and only natural flow remains.
+      </p>
+      <p>BSVibe applies that philosophy to software.</p>
+    </section>
+
+    <section class="about-section">
+      <h2>Mission</h2>
+      <p>
+        In an era of exploding AI tools, users are forced to make more and more decisions.
+        Which model is best, which agent is safe, what knowledge do you need — every time, you have to think and decide.
+      </p>
+      <p>
+        BSVibe reduces those decisions. We handle the complexity, you get the results.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Products</h2>
+      <ul class="product-list">
+        <li><a href="/en/products/bsgateway"><strong>BSGateway</strong> — Smart LLM Routing</a></li>
+        <li><a href="/en/products/bsnexus"><strong>BSNexus</strong> — AI Agent Orchestration</a></li>
+        <li><a href="/en/products/bsupervisor"><strong>BSupervisor</strong> — AI Audit & Safety</a></li>
+        <li><a href="/en/products/bsage"><strong>BSage</strong> — Ontology-Based Knowledge</a></li>
+      </ul>
+    </section>
+
+    <section class="about-section">
+      <h2>Values</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <h3>Independence</h3>
+          <p>Each product delivers value on its own. Freedom from lock-in.</p>
+        </div>
+        <div class="value-card">
+          <h3>Connection</h3>
+          <p>Used together, value multiplies. One account, one experience.</p>
+        </div>
+        <div class="value-card">
+          <h3>Safety</h3>
+          <p>Every AI action is traceable and controllable. Peace of mind, even while you sleep.</p>
+        </div>
+        <div class="value-card">
+          <h3>Transparency</h3>
+          <p>Pricing, data, decisions. Nothing to hide.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Get in Touch</h2>
+      <p>If you have questions or partnership proposals, please reach out via <a href="/en/contact">our contact page</a>.</p>
+    </section>
+  </div>
+</MainLayout>
+
+<style>
+  .about-page { max-width: 720px; margin: 0 auto; padding: 16px 24px 120px; }
+  .about-hero { text-align: center; margin-bottom: 64px; }
+  .about-hero h1 { color: #f2f3f7; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.035em; margin-bottom: 16px; }
+  .about-hero .lead { font-size: 1.125rem; color: #8187a8; line-height: 1.7; }
+  .about-section { margin-bottom: 56px; }
+  .about-section h2 { color: #f2f3f7; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .about-section p { color: #a8adc6; font-size: 1rem; line-height: 1.8; margin-bottom: 16px; }
+  .about-section a { color: #818cf8; text-decoration: none; }
+  .about-section a:hover { text-decoration: underline; }
+  .product-list { list-style: none; padding: 0; margin: 0; }
+  .product-list li { padding: 14px 0; border-bottom: 1px solid #1e2033; }
+  .product-list li:last-child { border-bottom: none; }
+  .product-list a { color: #a8adc6; font-size: 1rem; }
+  .product-list strong { color: #f2f3f7; margin-right: 8px; }
+  .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .value-card { padding: 24px; border-radius: 12px; border: 1px solid #2a2d42; background-color: #111218; }
+  .value-card h3 { color: #f2f3f7; font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; }
+  .value-card p { color: #8187a8; font-size: 0.875rem; line-height: 1.6; margin: 0; }
+</style>
