@@ -279,7 +279,17 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
           </div>
           {user ? (
             <>
-              <a href={`${docsBase}/account`} style={{ fontSize: "0.8125rem", color: "#818cf8", fontWeight: 500, textDecoration: "none" }}>{user.email}</a>
+              <a href={`${docsBase === "" ? "" : "/en"}/account`} style={{
+                padding: "6px 16px",
+                borderRadius: 8,
+                backgroundColor: "rgba(99,102,241,0.10)",
+                color: "#818cf8",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}>
+                {user.email}
+              </a>
               <button onClick={handleLogout} className="nav-link" style={{ fontSize: "0.8125rem", fontWeight: 500, background: "none", border: "none", cursor: "pointer", color: "#8187a8" }}>
                 {locale === "ko" ? "로그아웃" : "Log out"}
               </button>
@@ -349,7 +359,12 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
             ))}
           </div>
           {user ? (
-            <a href={`${docsBase === "" ? "" : "/en"}/account`} style={{ fontSize: "0.875rem", color: "#818cf8", textDecoration: "none" }}>{user.email}</a>
+            <>
+              <a href={`${docsBase === "" ? "" : "/en"}/account`} style={{ fontSize: "0.875rem", color: "#818cf8", textDecoration: "none" }}>{user.email}</a>
+              <button onClick={handleLogout} className="nav-link" style={{ fontSize: "0.875rem", background: "none", border: "none", cursor: "pointer", color: "#8187a8" }}>
+                {locale === "ko" ? "로그아웃" : "Log out"}
+              </button>
+            </>
           ) : (
             <button onClick={() => goAuth("signup")} className="nav-link" style={{ fontSize: "0.875rem", background: "none", border: "none", cursor: "pointer", color: "#8187a8" }}>{l.nav.getStarted}</button>
           )}
