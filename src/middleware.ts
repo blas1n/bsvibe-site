@@ -19,10 +19,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { user, newCookie } = await validateSession(cookieHeader);
 
   if (!user) {
-    const origin = context.url.origin;
-    const callbackUri = encodeURIComponent(`${origin}/auth/callback`);
-    const returnUrl = encodeURIComponent(context.url.href);
-    const loginUrl = `https://auth.bsvibe.dev/login?redirect_uri=${callbackUri}&state=${returnUrl}`;
+    const loginUrl = `https://auth.bsvibe.dev/login`;
     return context.redirect(loginUrl, 302);
   }
 

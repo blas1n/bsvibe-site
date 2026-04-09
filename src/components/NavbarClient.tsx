@@ -108,11 +108,10 @@ export default function NavbarClient({ locale = 'ko' }: { locale?: Locale }) {
             </>
           ) : (
             <>
-              <a href={`https://auth.bsvibe.dev/signup?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`} style={{
+              <a href="https://auth.bsvibe.dev/signup" style={{
                 padding: '6px 16px', borderRadius: 8, backgroundColor: 'rgba(99,102,241,0.10)',
                 color: '#818cf8', fontSize: '0.8125rem', fontWeight: 600, textDecoration: 'none',
               }}>{l.nav.getStarted}</a>
-              <a href={`https://auth.bsvibe.dev/login?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`} className="nav-link" style={{ fontSize: '0.8125rem', fontWeight: 500 }}>{l.nav.login}</a>
             </>
           )}
         </div>
@@ -151,7 +150,7 @@ export default function NavbarClient({ locale = 'ko' }: { locale?: Locale }) {
           {user ? (
             <a href={`${prefix}/account`} style={{ fontSize: '0.875rem', color: '#818cf8', textDecoration: 'none' }}>{user.email}</a>
           ) : (
-            <a href={`https://auth.bsvibe.dev/login?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`} className="nav-link" style={{ fontSize: '0.875rem' }}>{l.nav.login}</a>
+            <a href="https://auth.bsvibe.dev/signup" className="nav-link" style={{ fontSize: '0.875rem' }}>{l.nav.getStarted}</a>
           )}
         </div>
       )}

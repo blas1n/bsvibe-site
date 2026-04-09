@@ -20,7 +20,7 @@ const ctaContact = locale === 'en' ? 'Contact Us' : '문의하기';
       const ctaLabel = tier.isContactOnly ? ctaContact : ctaSignup;
       const ctaHref = tier.isContactOnly
         ? 'mailto:contact@bsvibe.dev'
-        : `https://auth.bsvibe.dev/signup?redirect_uri=${encodeURIComponent('https://bsvibe.dev/auth/callback')}`;
+        : 'https://auth.bsvibe.dev/signup';
       return (
         <div class:list={['tier-card', { highlighted: tier.isHighlighted }]}
              style={tier.isHighlighted ? `border-color: ${product.accentColor}40;` : ''}>

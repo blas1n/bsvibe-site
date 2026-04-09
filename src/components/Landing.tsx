@@ -134,8 +134,7 @@ export default function BSVibeLanding({ locale = "ko" }: { locale?: Locale }) {
   const [user, setUser] = useState<UserInfo | null>(null);
 
   function goAuth(mode: "signup" | "login") {
-    const cb = encodeURIComponent(window.location.origin + "/auth/callback");
-    window.location.href = `https://auth.bsvibe.dev/${mode}?redirect_uri=${cb}`;
+    window.location.href = `https://auth.bsvibe.dev/${mode}`;
   }
 
   useEffect(() => {
